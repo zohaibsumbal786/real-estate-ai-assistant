@@ -1,0 +1,49 @@
+{
+  "name": "@dubai-ai/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "dev:worker:knowledge": "tsx watch src/workers/knowledge-worker.ts",
+    "dev:worker:reminders": "tsx watch src/workers/reminder-worker.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "start:worker:knowledge": "node dist/workers/knowledge-worker.js",
+    "start:worker:reminders": "node dist/workers/reminder-worker.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dubai-ai/db": "0.1.0",
+    "bcryptjs": "^3.0.2",
+    "bullmq": "^5.79.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.11.1",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.12.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.1",
+    "openai": "^6.10.0",
+    "pdf-parse": "^2.4.5",
+    "stripe": "^22.2.2",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^22.15.32",
+    "@types/nodemailer": "^8.0.1",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.1",
+    "vitest": "^3.2.3"
+  }
+}
