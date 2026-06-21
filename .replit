@@ -1,0 +1,49 @@
+modules = ["nodejs-20", "postgresql-16"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "cloudrun"
+build = ["sh", "-c", "npm install && npm run build"]
+run = ["sh", "-c", "npm run db:deploy && npm run db:seed && node apps/api/dist/server.js & npx --prefix apps/web next start -p 3000"]
+
+[[ports]]
+localPort = 4000
+externalPort = 4000
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[env]
+NODE_ENV = "production"
+PORT = "4000"
+REDIS_OPTIONAL = "true"
+
+[workflows]
+runButton = "Start App"
+
+[[workflows.workflow]]
+name = "Start App"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:deploy"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:seed"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node apps/api/dist/server.js & npx --prefix apps/web next start -p 3000"
