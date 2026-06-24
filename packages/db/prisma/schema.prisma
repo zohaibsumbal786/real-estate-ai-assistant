@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -128,6 +129,7 @@ model User {
   businessHours   BusinessHour[]
   notifications  Notification[]
   refreshTokens  RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([organizationId])
   @@index([role])
@@ -409,4 +411,17 @@ model RefreshToken {
   @@index([userId])
   @@index([expiresAt])
   @@index([organizationId, revokedAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
