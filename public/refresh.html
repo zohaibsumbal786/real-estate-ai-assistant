@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Reset & Open</title></head>
+<body>
+<script>
+// Clear old data, keep auth
+var user = localStorage.getItem("cpro_user");
+var role = localStorage.getItem("cpro_role");
+localStorage.clear();
+// Re-set auth
+localStorage.setItem("cpro_auth","1");
+localStorage.setItem("cpro_role", role || "user");
+if(user) localStorage.setItem("cpro_user", user);
+window.location.href = "app.html";
+</script>
+</body></html>

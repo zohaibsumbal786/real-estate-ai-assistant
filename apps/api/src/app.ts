@@ -2,6 +2,8 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { config } from "./config.js";
 import { errorHandler, notFound } from "./middleware/error-handler.js";
 import { inputValidationMiddleware } from "./middleware/input-validation.js";
@@ -23,6 +25,9 @@ import { teamRouter } from "./routes/team.js";
 import { whatsappRouter } from "./routes/whatsapp.js";
 import { workersRouter } from "./routes/workers.js";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const publicPath = resolve(__dirname, "../../../public");
+
 export function createApp() {
   const app = express();
 
@@ -31,11 +36,11 @@ export function createApp() {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         imgSrc: ["'self'", "data:", "https:"],
         connectSrc: ["'self'", "https:"],
-        fontSrc: ["'self'", "data:"],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
         frameSrc: ["'none'"],
         objectSrc: ["'none'"]
       }
@@ -50,6 +55,10 @@ export function createApp() {
   
   // Parse CORS origins from config (comma-separated)
   const corsOrigins = config.WEB_ORIGIN.split(",").map((origin) => origin.trim());
+  // Add localhost:4000 by default since frontend is served from same server
+  if (!corsOrigins.includes("http://localhost:4000")) {
+    corsOrigins.push("http://localhost:4000");
+  }
   
   // Enhanced CORS configuration
   app.use(
@@ -96,6 +105,9 @@ export function createApp() {
   app.use(addRequestIdHeader);
   app.use(requestLoggingMiddleware);
 
+  // Serve static frontend files
+  app.use(express.static(publicPath));
+
   // Root endpoint
   app.get("/", (_req, res) => {
     res.json({
@@ -124,7 +136,7 @@ export function createApp() {
   });
 
   app.get("/health", (_req, res) => {
-    res.json({ status: "ok", service: "dubai-ai-business-agent-api" });
+    res.json({ status: "ok", service: "contractorpro-ai" });
   });
 
   app.use("/api/auth", authRouter);
@@ -142,6 +154,11 @@ export function createApp() {
   app.use("/api/team", teamRouter);
   app.use("/api/workers", workersRouter);
   app.use("/api/whatsapp", whatsappRouter);
+
+  // Fallback to frontend HTML for SPA routing (must be before error handlers)
+  app.use((_req, res) => {
+    res.sendFile(resolve(publicPath, "index.html"));
+  });
 
   app.use(notFound);
   app.use(errorHandler);
