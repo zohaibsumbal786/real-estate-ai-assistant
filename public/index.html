@@ -488,7 +488,7 @@ function fillAdmin() {
 }
 
 // ── SIGN IN ─────────────────────────────────────────────────────
-function doSignIn() {
+async function doSignIn() {
   clearErrors();
   const email    = document.getElementById('si-email').value.trim().toLowerCase();
   const password = document.getElementById('si-password').value;
@@ -502,37 +502,47 @@ function doSignIn() {
   }
   if (!valid) return;
 
-  // Show loading
   const btn = document.getElementById('si-btn');
   btn.innerHTML = '<span class="spinner"></span> Signing in...';
   btn.disabled = true;
 
-  setTimeout(() => {
-    // Check credentials
-    const cred = CREDENTIALS[email];
-    if (cred && cred.pass === password) {
-      const user = { email, name: cred.name, initials: cred.initials, company: cred.company, plan: cred.plan, role: cred.role };
+  // Try real API first, fallback to demo credentials
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const user = { email, name: data.data?.user?.name || email, initials: (data.data?.user?.name||email).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), company: data.data?.user?.company || 'My Company', plan: 'Pro', role: data.data?.user?.role?.toLowerCase() === 'admin' ? 'admin' : 'user', token: data.data?.accessToken };
       localStorage.setItem('cpro_user', JSON.stringify(user));
       localStorage.setItem('cpro_auth', '1');
-      localStorage.setItem('cpro_role', cred.role);
-      // Redirect based on role
-      if (cred.role === 'admin') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'app.html';
-      }
-    } else {
-      btn.innerHTML = 'Sign In';
-      btn.disabled = false;
-      document.getElementById('si-email').classList.add('error');
-      document.getElementById('si-password').classList.add('error');
-      showErr('si-pass-err', '❌ Incorrect email or password');
+      localStorage.setItem('cpro_role', user.role);
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'app.html';
+      return;
     }
-  }, 1000);
+  } catch(e) { /* API not available, use demo */ }
+
+  // Demo credentials fallback
+  const cred = CREDENTIALS[email];
+  if (cred && cred.pass === password) {
+    const user = { email, name: cred.name, initials: cred.initials, company: cred.company, plan: cred.plan, role: cred.role };
+    localStorage.setItem('cpro_user', JSON.stringify(user));
+    localStorage.setItem('cpro_auth', '1');
+    localStorage.setItem('cpro_role', cred.role);
+    window.location.href = cred.role === 'admin' ? 'admin.html' : 'app.html';
+  } else {
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
+    document.getElementById('si-email').classList.add('error');
+    document.getElementById('si-password').classList.add('error');
+    showErr('si-pass-err', '❌ Incorrect email or password');
+  }
 }
 
 // ── SIGN UP ─────────────────────────────────────────────────────
-function doSignUp() {
+async function doSignUp() {
   clearErrors();
   const fname   = document.getElementById('su-fname').value.trim();
   const lname   = document.getElementById('su-lname').value.trim();
@@ -552,12 +562,29 @@ function doSignUp() {
   btn.innerHTML = '<span class="spinner"></span> Creating account...';
   btn.disabled = true;
 
-  setTimeout(() => {
-    const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial' };
-    localStorage.setItem('cpro_user', JSON.stringify(user));
-    localStorage.setItem('cpro_auth', '1');
-    window.location.href = 'app.html';
-  }, 1400);
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass, name: fname + ' ' + lname, companyName: company })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial', token: data.data?.accessToken };
+      localStorage.setItem('cpro_user', JSON.stringify(user));
+      localStorage.setItem('cpro_auth', '1');
+      localStorage.setItem('cpro_role', 'user');
+      window.location.href = 'app.html';
+      return;
+    }
+  } catch(e) { /* fallback */ }
+
+  // Offline/demo fallback
+  const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial' };
+  localStorage.setItem('cpro_user', JSON.stringify(user));
+  localStorage.setItem('cpro_auth', '1');
+  localStorage.setItem('cpro_role', 'user');
+  window.location.href = 'app.html';
 }
 
 // ── GOOGLE AUTH ─────────────────────────────────────────────────

@@ -2147,6 +2147,82 @@ function doSignOut() {
 }
 
 window.addEventListener('DOMContentLoaded', loadUserData);
+
+// ── REAL API INTEGRATION ──────────────────────────────────────────
+const API = {
+  token: () => { try { return JSON.parse(localStorage.getItem('cpro_user') || '{}').token || ''; } catch(e){ return ''; } },
+  headers: () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.token() }),
+
+  async get(path) {
+    try {
+      const r = await fetch('/api' + path, { headers: API.headers() });
+      if (r.ok) return r.json();
+    } catch(e) {}
+    return null;
+  },
+
+  async post(path, body) {
+    try {
+      const r = await fetch('/api' + path, { method: 'POST', headers: API.headers(), body: JSON.stringify(body) });
+      if (r.ok) return r.json();
+    } catch(e) {}
+    return null;
+  }
+};
+
+// Load real dashboard stats from API if token available
+async function loadRealDashboard() {
+  if (!API.token()) return;
+  const dash = await API.get('/dashboard');
+  if (!dash?.data) return;
+  const d = dash.data;
+  const mRev = document.getElementById('m-revenue');
+  const mJobs = document.getElementById('m-jobs');
+  const mProps = document.getElementById('m-proposals');
+  const mOut = document.getElementById('m-outstanding');
+  if (mRev && d.revenue !== undefined) mRev.textContent = '$' + Number(d.revenue||0).toLocaleString();
+  if (mJobs && d.activeJobs !== undefined) mJobs.textContent = d.activeJobs || 0;
+  if (mProps && d.openConversations !== undefined) mProps.textContent = d.openConversations || 0;
+  if (mOut && d.outstandingAmount !== undefined) mOut.textContent = '$' + Number(d.outstandingAmount||0).toLocaleString();
+}
+
+// Load real leads from API
+async function loadRealLeads() {
+  if (!API.token()) return;
+  const res = await API.get('/leads?limit=20');
+  if (!res?.data?.leads?.length) return;
+  const leads = res.data.leads;
+  // Merge into localStorage for the pipeline render
+  const stageMap = { NEW:'New', QUALIFIED:'Contacted', CONTACTED:'Contacted', PROPOSAL_SENT:'Proposal Sent', WON:'Won', LOST:'Lost' };
+  const mapped = leads.map(l => ({ name: l.name, company: l.company||l.name, value: 0, stage: stageMap[l.status]||'New', created: l.createdAt?.split('T')[0]||'' }));
+  saveData('cpro_leads', mapped);
+  renderCRMPipeline();
+  const newEl = document.getElementById('crm-new');
+  if (newEl) newEl.textContent = leads.filter(l=>l.status==='NEW').length;
+}
+
+// Load real conversations
+async function loadRealConversations() {
+  if (!API.token()) return;
+  const res = await API.get('/conversations?limit=10');
+  if (!res?.data?.conversations?.length) return;
+  // Update notifications badge
+  const open = res.data.conversations.filter(c=>c.status==='OPEN').length;
+  if (open > 0) {
+    const dot = document.getElementById('notif-dot');
+    if (dot) dot.style.display = 'inline-block';
+  }
+}
+
+// Run API data load on dashboard
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    loadRealDashboard();
+    loadRealLeads();
+    loadRealConversations();
+  }, 500);
+});
+
 </script>
 </body>
 </html>
