@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContractorPro AI – Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0b0d;
+    --bg-2: #111318;
+    --bg-3: #1a1d25;
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.14);
+    --text: #f1f2f4;
+    --text-2: #9ba3b5;
+    --text-3: #5c6478;
+    --accent: #4f8ef7;
+    --accent-2: #3a7de8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --purple: #a855f7;
+    --r: 8px;
+    --r-lg: 12px;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* BACKGROUND GLOW */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-glow::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,142,247,0.12) 0%, transparent 70%);
+    top: -100px; left: -100px;
+  }
+  .bg-glow::after {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
+    bottom: -100px; right: -100px;
+  }
+
+  /* LAYOUT */
+  .auth-wrapper {
+    position: relative; z-index: 1;
+    display: flex;
+    width: 100%;
+    max-width: 960px;
+    min-height: 580px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 0.5px solid var(--border-2);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    margin: 1rem;
+  }
+
+  /* LEFT PANEL */
+  .auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(79,142,247,0.15) 0%, rgba(168,85,247,0.1) 50%, rgba(20,184,166,0.08) 100%);
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 0.5px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-left::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(79,142,247,0.15) 0%, transparent 70%);
+    top: -50px; right: -50px;
+    pointer-events: none;
+  }
+  .left-logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .left-logo-icon {
+    width: 38px; height: 38px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .left-logo-text { font-size: 18px; font-weight: 700; }
+  .left-logo-sub { font-size: 11px; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .left-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 0; }
+  .left-title { font-size: 28px; font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 1rem; }
+  .left-title span { color: var(--accent); }
+  .left-desc { font-size: 14px; color: var(--text-2); line-height: 1.7; margin-bottom: 2rem; }
+
+  .feature-list { display: flex; flex-direction: column; gap: 12px; }
+  .feature-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
+  .feature-dot { width: 20px; height: 20px; border-radius: 50%; background: rgba(79,142,247,0.15); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+
+  .left-bottom { font-size: 11px; color: var(--text-3); }
+
+  /* RIGHT PANEL */
+  .auth-right {
+    width: 420px;
+    background: var(--bg-2);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .auth-tabs {
+    display: flex;
+    background: var(--bg-3);
+    border-radius: var(--r);
+    padding: 3px;
+    margin-bottom: 2rem;
+  }
+  .auth-tab {
+    flex: 1; text-align: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    color: var(--text-3);
+    transition: all 0.15s;
+    border: none; background: none;
+  }
+  .auth-tab.active {
+    background: var(--bg-2);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .auth-form { display: flex; flex-direction: column; gap: 14px; }
+  .auth-form.hidden { display: none; }
+
+  .form-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .form-sub { font-size: 13px; color: var(--text-3); margin-bottom: 6px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--text-2); }
+  .field input {
+    background: var(--bg-3);
+    border: 0.5px solid var(--border-2);
+    border-radius: var(--r);
+    padding: 0.65rem 0.85rem;
+    font-size: 13px; color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.12);
+  }
+  .field input.error { border-color: var(--red); }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .field-hint { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .field-error { font-size: 11px; color: var(--red); margin-top: 2px; display: none; }
+  .field-error.show { display: block; }
+
+  .btn-auth {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--r);
+    padding: 0.75rem;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, transform 0.1s;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .btn-auth:hover { background: var(--accent-2); }
+  .btn-auth:active { transform: scale(0.99); }
+  .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; color: var(--text-3); margin: 4px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 0.5px; background: var(--border-2);
+  }
+
+  .btn-google {
+    background: var(--bg-3);
+    border: 0.5px solid var(--border-2);
+    border-radius: var(--r);
+    padding: 0.65rem;
+    font-size: 13px; font-weight: 500;
+    color: var(--text); cursor: pointer;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s;
+    width: 100%;
+  }
+  .btn-google:hover { background: var(--bg); }
+
+  .forgot-link {
+    text-align: right; font-size: 12px; color: var(--accent);
+    cursor: pointer; text-decoration: none;
+    margin-top: -6px;
+  }
+  .forgot-link:hover { text-decoration: underline; }
+
+  .terms { font-size: 11px; color: var(--text-3); text-align: center; line-height: 1.5; }
+  .terms a { color: var(--accent); text-decoration: none; }
+  .terms a:hover { text-decoration: underline; }
+
+  /* LOADING SPINNER */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SUCCESS STATE */
+  .auth-success {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 2rem 0;
+  }
+  .success-icon {
+    width: 60px; height: 60px;
+    background: rgba(34,197,94,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  /* TOAST */
+  #auth-toast {
+    display: none;
+    position: fixed;
+    bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: var(--red); color: #fff;
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--r-lg);
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 999;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .auth-left { display: none; }
+    .auth-right { width: 100%; padding: 2rem 1.5rem; }
+    .auth-wrapper { max-width: 420px; min-height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="auth-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="left-logo">
+      <div class="left-logo-icon">🏗️</div>
+      <div>
+        <div class="left-logo-text">ContractorPro AI</div>
+        <div class="left-logo-sub">Business OS for Contractors</div>
+      </div>
+    </div>
+
+    <div class="left-hero">
+      <div class="left-title">Run your entire<br/>contracting business<br/>with <span>AI power</span></div>
+      <div class="left-desc">Manage jobs, clients, invoices, and leads — all in one place. AI does the heavy lifting.</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot">🤖</div> AI-generated proposals & estimates</div>
+        <div class="feature-item"><div class="feature-dot">💰</div> Invoicing with Stripe payments</div>
+        <div class="feature-item"><div class="feature-dot">🎯</div> Smart CRM with lead scoring</div>
+        <div class="feature-item"><div class="feature-dot">📅</div> Team scheduling & dispatch</div>
+        <div class="feature-item"><div class="feature-dot">📈</div> Real-time reports & analytics</div>
+      </div>
+    </div>
+
+    <div class="left-bottom">© 2025 ContractorPro AI · All rights reserved</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- SIGN IN FORM -->
+    <div class="auth-form" id="form-signin">
+      <div>
+        <div class="form-title">Welcome back</div>
+        <div class="form-sub">Sign in to your ContractorPro account</div>
+      </div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="si-email" placeholder="you@company.com" autocomplete="email" />
+        <div class="field-error" id="si-email-err">Please enter a valid email</div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="si-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()" />
+        <div class="field-error" id="si-pass-err">Password is required</div>
+      </div>
+
+      <a class="forgot-link" onclick="showForgot()">Forgot password?</a>
+
+      <button class="btn-auth" id="si-btn" onclick="doSignIn()">Sign In</button>
+
+      <div class="divider">or</div>
+
+      <button class="btn-google" onclick="doGoogleAuth()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="terms">Don't have an account? <a onclick="switchTab('signup')">Create one free</a></div>
+
+      <!-- DEMO CREDENTIALS BOX -->
+      <div style="margin-top:8px;background:rgba(79,142,247,0.07);border:0.5px solid rgba(79,142,247,0.25);border-radius:var(--r);padding:0.85rem 1rem;">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🔑 Demo Credentials</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <!-- User Account -->
+          <div onclick="fillUser()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--bg-3);padding:0.55rem 0.75rem;border-radius:6px;border:0.5px solid var(--border-2);transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border-2)'">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text)">👤 User Login</div>
+              <div style="font-size:11px;color:var(--text-3);margin-top:2px;">demo@contractorpro.ai &nbsp;·&nbsp; demo1234</div>
+            </div>
+            <span style="font-size:10px;color:var(--accent);font-weight:600;">Click to fill →</span>
+          </div>
+          <!-- Admin Account -->
+          <div onclick="fillAdmin()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(239,68,68,0.07);padding:0.55rem 0.75rem;border-radius:6px;border:0.5px solid rgba(239,68,68,0.2);transition:border-color 0.15s;" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='rgba(239,68,68,0.2)'">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#ef4444;">🛡️ Admin Login</div>
+              <div style="font-size:11px;color:var(--text-3);margin-top:2px;">admin@contractorpro.ai &nbsp;·&nbsp; admin2025</div>
+            </div>
+            <span style="font-size:10px;color:#ef4444;font-weight:600;">Click to fill →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div class="auth-form hidden" id="form-signup">
+      <div>
+        <div class="form-title">Create your account</div>
+        <div class="form-sub">Start your free 14-day trial — no credit card needed</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" id="su-fname" placeholder="Jake" autocomplete="given-name" />
+          <div class="field-error" id="su-fname-err">Required</div>
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" id="su-lname" placeholder="Reynolds" autocomplete="family-name" />
+          <div class="field-error" id="su-lname-err">Required</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Company Name</label>
+        <input type="text" id="su-company" placeholder="Reynolds Contracting Co." />
+        <div class="field-error" id="su-company-err">Required</div>
+      </div>
+
+      <div class="field">
+        <label>Work Email</label>
+        <input type="email" id="su-email" placeholder="you@company.com" autocomplete="email" />
+        <div class="field-error" id="su-email-err">Enter a valid email</div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="su-password" placeholder="Min 8 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignUp()" />
+        <div class="field-hint" id="su-pass-hint">Use at least 8 characters</div>
+        <div class="field-error" id="su-pass-err">Min 8 characters required</div>
+      </div>
+
+      <button class="btn-auth" id="su-btn" onclick="doSignUp()">Create Free Account</button>
+
+      <div class="divider">or</div>
+
+      <button class="btn-google" onclick="doGoogleAuth()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="terms">By signing up you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="auth-toast"></div>
+
+<script>
+// ── TAB SWITCH ──────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('form-signin').classList.toggle('hidden', tab !== 'signin');
+  document.getElementById('form-signup').classList.toggle('hidden', tab !== 'signup');
+  clearErrors();
+}
+
+// ── VALIDATION HELPERS ──────────────────────────────────────────
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg || el.textContent; el.classList.add('show'); }
+}
+function clearErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
+}
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field input').forEach(i => i.classList.remove('error'));
+}
+
+// ── TOAST ───────────────────────────────────────────────────────
+function showAuthToast(msg, color = 'var(--red)') {
+  const t = document.getElementById('auth-toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.style.display = 'block';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.style.display = 'none', 300); }, 3000);
+}
+
+// ── DEMO CREDENTIALS ────────────────────────────────────────────
+const CREDENTIALS = {
+  'demo@contractorpro.ai':  { pass: 'demo1234',  role: 'user',  name: 'Jake Reynolds',  initials: 'JR', company: 'Reynolds Contracting Co.', plan: 'Pro' },
+  'admin@contractorpro.ai': { pass: 'admin2025', role: 'admin', name: 'Admin',           initials: 'AD', company: 'ContractorPro AI',          plan: 'Admin' },
+};
+
+function fillUser() {
+  document.getElementById('si-email').value    = 'demo@contractorpro.ai';
+  document.getElementById('si-password').value = 'demo1234';
+  clearErrors();
+}
+function fillAdmin() {
+  document.getElementById('si-email').value    = 'admin@contractorpro.ai';
+  document.getElementById('si-password').value = 'admin2025';
+  clearErrors();
+}
+
+// ── SIGN IN ─────────────────────────────────────────────────────
+function doSignIn() {
+  clearErrors();
+  const email    = document.getElementById('si-email').value.trim().toLowerCase();
+  const password = document.getElementById('si-password').value;
+  let valid = true;
+
+  if (!isValidEmail(email)) {
+    showErr('si-email-err'); document.getElementById('si-email').classList.add('error'); valid = false;
+  }
+  if (!password) {
+    showErr('si-pass-err'); document.getElementById('si-password').classList.add('error'); valid = false;
+  }
+  if (!valid) return;
+
+  // Show loading
+  const btn = document.getElementById('si-btn');
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    // Check credentials
+    const cred = CREDENTIALS[email];
+    if (cred && cred.pass === password) {
+      const user = { email, name: cred.name, initials: cred.initials, company: cred.company, plan: cred.plan, role: cred.role };
+      localStorage.setItem('cpro_user', JSON.stringify(user));
+      localStorage.setItem('cpro_auth', '1');
+      localStorage.setItem('cpro_role', cred.role);
+      // Redirect based on role
+      if (cred.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'contractorpro-ai.html';
+      }
+    } else {
+      btn.innerHTML = 'Sign In';
+      btn.disabled = false;
+      document.getElementById('si-email').classList.add('error');
+      document.getElementById('si-password').classList.add('error');
+      showErr('si-pass-err', '❌ Incorrect email or password');
+    }
+  }, 1000);
+}
+
+// ── SIGN UP ─────────────────────────────────────────────────────
+function doSignUp() {
+  clearErrors();
+  const fname   = document.getElementById('su-fname').value.trim();
+  const lname   = document.getElementById('su-lname').value.trim();
+  const company = document.getElementById('su-company').value.trim();
+  const email   = document.getElementById('su-email').value.trim();
+  const pass    = document.getElementById('su-password').value;
+  let valid = true;
+
+  if (!fname) { showErr('su-fname-err'); document.getElementById('su-fname').classList.add('error'); valid = false; }
+  if (!lname) { showErr('su-lname-err'); document.getElementById('su-lname').classList.add('error'); valid = false; }
+  if (!company) { showErr('su-company-err'); document.getElementById('su-company').classList.add('error'); valid = false; }
+  if (!isValidEmail(email)) { showErr('su-email-err'); document.getElementById('su-email').classList.add('error'); valid = false; }
+  if (pass.length < 8) { showErr('su-pass-err'); document.getElementById('su-password').classList.add('error'); valid = false; }
+  if (!valid) return;
+
+  const btn = document.getElementById('su-btn');
+  btn.innerHTML = '<span class="spinner"></span> Creating account...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial' };
+    localStorage.setItem('cpro_user', JSON.stringify(user));
+    localStorage.setItem('cpro_auth', '1');
+    window.location.href = 'contractorpro-ai.html';
+  }, 1400);
+}
+
+// ── GOOGLE AUTH ─────────────────────────────────────────────────
+function doGoogleAuth() {
+  showAuthToast('Google auth requires backend integration', 'var(--accent)');
+}
+
+// ── FORGOT PASSWORD ─────────────────────────────────────────────
+function showForgot() {
+  const email = document.getElementById('si-email').value.trim();
+  if (!isValidEmail(email)) {
+    showAuthToast('Enter your email first, then click Forgot password');
+    return;
+  }
+  showAuthToast('✓ Password reset link sent to ' + email, 'var(--green)');
+}
+
+// ── AUTH GUARD — redirect if already logged in ──────────────────
+if (localStorage.getItem('cpro_auth') === '1') {
+  const role = localStorage.getItem('cpro_role');
+  if (role === 'admin') {
+    window.location.href = 'admin.html';
+  } else {
+    window.location.href = 'contractorpro-ai.html';
+  }
+}
+</script>
+</body>
+</html>

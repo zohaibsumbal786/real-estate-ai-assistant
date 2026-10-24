@@ -16,6 +16,15 @@ const updateLeadSchema = z.object({
   assignedToId: z.string().nullable().optional()
 });
 
+const createLeadSchema = z.object({
+  name: z.string().min(2).max(120),
+  phone: z.string().min(6).max(30),
+  email: z.string().email().optional(),
+  company: z.string().max(120).optional(),
+  status: z.nativeEnum(LeadStatus).optional(),
+  assignedToId: z.string().optional()
+});
+
 leadsRouter.use(authenticate, enforceTenant);
 
 leadsRouter.get("/", async (req, res, next) => {
@@ -41,6 +50,30 @@ leadsRouter.get("/", async (req, res, next) => {
   }
 });
 
+leadsRouter.post("/", async (req, res, next) => {
+  try {
+    const payload = createLeadSchema.parse(req.body);
+    const lead = await prisma.lead.create({
+      data: {
+        organizationId: req.tenantId!,
+        name: payload.name,
+        phone: payload.phone,
+        email: payload.email,
+        company: payload.company,
+        status: payload.status ?? LeadStatus.NEW,
+        assignedToId: payload.assignedToId,
+        source: "MANUAL"
+      },
+      include: {
+        assignedTo: { select: { id: true, name: true, email: true, role: true } }
+      }
+    });
+    res.status(201).json({ data: lead });
+  } catch (error) {
+    next(error);
+  }
+});
+
 leadsRouter.patch("/:id", async (req, res, next) => {
   try {
     const payload = updateLeadSchema.parse(req.body);
@@ -52,7 +85,7 @@ leadsRouter.patch("/:id", async (req, res, next) => {
         assignedTo: { select: { id: true, name: true, email: true, role: true } }
       }
     });
-    res.json(lead);
+    res.json({ data: lead });
   } catch (error) {
     next(error);
   }

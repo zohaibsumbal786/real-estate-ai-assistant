@@ -1,0 +1,549 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContractorPro AI – Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0b0d; --bg-2: #111318; --bg-3: #1a1d25; --bg-4: #22263a;
+  --border: rgba(255,255,255,0.08); --border-2: rgba(255,255,255,0.14);
+  --text: #f1f2f4; --text-2: #9ba3b5; --text-3: #5c6478;
+  --accent: #4f8ef7; --accent-2: #3a7de8;
+  --green: #22c55e; --red: #ef4444; --amber: #f59e0b; --purple: #a855f7; --teal: #14b8a6;
+  --r: 8px; --r-lg: 12px;
+}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+/* SIDEBAR */
+.sidebar { width: 230px; min-width: 230px; background: var(--bg-2); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+.logo { padding: 1.25rem; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 32px; height: 32px; background: var(--red); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.logo-text { font-size: 14px; font-weight: 700; }
+.logo-badge { font-size: 9px; background: var(--red); color: #fff; padding: 1px 6px; border-radius: 20px; font-weight: 700; letter-spacing: 0.5px; }
+.nav-section { padding: 0.75rem 1rem 0.25rem; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 0.55rem 1rem; margin: 1px 0.5rem; border-radius: var(--r); font-size: 13px; color: var(--text-2); cursor: pointer; transition: all 0.15s; user-select: none; }
+.nav-item:hover { background: var(--bg-3); color: var(--text); }
+.nav-item.active { background: rgba(239,68,68,0.12); color: var(--red); }
+.nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 20px; }
+.sidebar-bottom { margin-top: auto; padding: 1rem; border-top: 0.5px solid var(--border); }
+.admin-card { display: flex; align-items: center; gap: 9px; }
+.admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: 54px; background: var(--bg-2); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem; position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.admin-badge-top { background: rgba(239,68,68,0.15); color: var(--red); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; border: 0.5px solid rgba(239,68,68,0.3); }
+
+/* CONTENT */
+.content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+.page { display: none; } .page.active { display: block; }
+
+/* CARDS */
+.card { background: var(--bg-2); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.25rem; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.card-title { font-size: 14px; font-weight: 600; }
+
+/* METRICS */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+.metric-card { background: var(--bg-2); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 1.1rem 1.25rem; }
+.metric-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.metric-value { font-size: 26px; font-weight: 700; }
+.metric-change { font-size: 12px; margin-top: 4px; color: var(--green); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { padding: 0.6rem 0.75rem; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 0.5px solid var(--border); }
+td { padding: 0.75rem; border-bottom: 0.5px solid rgba(255,255,255,0.04); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); }
+.badge-gray { background: rgba(255,255,255,0.08); color: var(--text-2); }
+.badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+/* BTN */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.45rem 0.85rem; border-radius: var(--r); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+.btn-primary { background: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-2); }
+.btn-danger { background: var(--red); color: #fff; } .btn-danger:hover { background: #dc2626; }
+.btn-ghost { background: transparent; color: var(--text-2); border: 0.5px solid var(--border-2); } .btn-ghost:hover { background: var(--bg-3); color: var(--text); }
+.btn-sm { padding: 0.28rem 0.65rem; font-size: 12px; }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+/* SECTION */
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: var(--text-3); margin-bottom: 1.25rem; }
+
+/* STAT ROW */
+.stat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+.stat-row:last-child { border-bottom: none; }
+
+/* INPUT */
+input[type="text"], input[type="email"], select {
+  background: var(--bg-3); border: 0.5px solid var(--border-2); border-radius: var(--r);
+  padding: 0.5rem 0.75rem; font-size: 13px; color: var(--text); font-family: inherit; outline: none;
+}
+input:focus, select:focus { border-color: var(--accent); }
+
+/* TOGGLE */
+.toggle { width: 36px; height: 20px; border-radius: 20px; background: var(--border-2); position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+.toggle::after { content:''; width:16px; height:16px; border-radius:50%; background:#fff; position:absolute; left:2px; top:2px; transition:left 0.2s; }
+.toggle.on { background: var(--green); } .toggle.on::after { left:18px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+/* TOAST */
+#admin-toast { display:none; position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999; color:#fff; padding:0.75rem 1.25rem; border-radius:var(--r-lg); font-size:13px; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.4); transition:opacity 0.4s; }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:1rem; }
+.modal-box { background:var(--bg-2); border:0.5px solid var(--border-2); border-radius:var(--r-lg); width:100%; max-width:480px; box-shadow:0 24px 64px rgba(0,0,0,0.6); }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem; border-bottom:0.5px solid var(--border); }
+.modal-body { padding:1.25rem; display:flex; flex-direction:column; gap:12px; }
+.modal-footer { padding:1rem 1.25rem; border-top:0.5px solid var(--border); display:flex; gap:8px; justify-content:flex-end; }
+.form-label { font-size:12px; font-weight:500; color:var(--text-2); margin-bottom:4px; display:block; }
+
+/* RESPONSIVE */
+@media(max-width:900px){ .sidebar{display:none;} .metrics{grid-template-columns:repeat(2,1fr);} .grid-2,.grid-3{grid-template-columns:1fr;} }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-text">ContractorPro</div>
+      <div class="logo-badge">ADMIN</div>
+    </div>
+  </div>
+  <div class="nav-section">Management</div>
+  <div class="nav-item active" onclick="navigate('overview')"><span>📊</span> Overview</div>
+  <div class="nav-item" onclick="navigate('users')"><span>👥</span> Users <span class="nav-badge" id="users-count">0</span></div>
+  <div class="nav-item" onclick="navigate('accounts')"><span>🏢</span> Accounts</div>
+  <div class="nav-section">System</div>
+  <div class="nav-item" onclick="navigate('settings')"><span>⚙️</span> Settings</div>
+  <div class="nav-item" onclick="navigate('logs')"><span>📋</span> Activity Logs</div>
+  <div class="sidebar-bottom">
+    <div class="admin-card">
+      <div class="admin-avatar">AD</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">Admin</div>
+        <div style="font-size:11px;color:var(--text-3)">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Admin Overview</div>
+    <div class="topbar-actions">
+      <span class="admin-badge-top">🛡️ ADMIN MODE</span>
+      <button class="btn btn-ghost btn-sm" onclick="doSignOut()" style="color:var(--red);border-color:rgba(239,68,68,0.3)">🚪 Sign Out</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW PAGE -->
+    <div class="page active" id="page-overview">
+      <div class="section-title">Admin Overview</div>
+      <div class="section-sub">Platform-wide stats and management</div>
+
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Total Users</div>
+          <div class="metric-value" id="stat-users">1</div>
+          <div class="metric-change">Active accounts</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pro Plans</div>
+          <div class="metric-value" style="color:var(--accent)">1</div>
+          <div class="metric-change">Paid subscriptions</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Logins</div>
+          <div class="metric-value" id="stat-logins">—</div>
+          <div class="metric-change">All time</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">System Status</div>
+          <div class="metric-value" style="color:var(--green);font-size:18px">● Online</div>
+          <div class="metric-change">All systems normal</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Registered Users</div><button class="btn btn-primary btn-sm" onclick="navigate('users')">Manage</button></div>
+          <div id="overview-users-list">
+            <div style="text-align:center;padding:2rem;color:var(--text-3)">Loading users...</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Quick Actions</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-ghost" style="justify-content:flex-start" onclick="navigate('users')">👥 Manage Users</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start" onclick="addTestUser()">➕ Add Test User</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start" onclick="clearAllUsers()">🗑️ Clear All Users</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start" onclick="navigate('logs')">📋 View Activity Logs</button>
+            <button class="btn btn-danger" style="justify-content:flex-start;margin-top:8px" onclick="doSignOut()">🚪 Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS PAGE -->
+    <div class="page" id="page-users">
+      <div class="section-title">User Management</div>
+      <div class="section-sub">All registered accounts</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:1rem">
+        <input type="text" id="user-search" placeholder="🔍 Search users..." oninput="renderUsers()" style="flex:1" />
+        <button class="btn btn-primary" onclick="openAddUserModal()">+ Add User</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Plan</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-3)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACCOUNTS PAGE -->
+    <div class="page" id="page-accounts">
+      <div class="section-title">Account Plans</div>
+      <div class="section-sub">Subscription management</div>
+      <div class="grid-3">
+        <div class="card" style="border-color:rgba(255,255,255,0.1)">
+          <div style="font-size:24px;margin-bottom:8px">🆓</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px">Free</div>
+          <div style="font-size:13px;color:var(--text-3);margin-bottom:1rem">Basic features</div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Max Jobs</span><span style="font-weight:600">5</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Clients</span><span style="font-weight:600">10</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">AI Features</span><span class="badge badge-red">No</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Price</span><span style="font-weight:700;color:var(--green)">$0/mo</span></div>
+        </div>
+        <div class="card" style="border-color:rgba(79,142,247,0.4);background:rgba(79,142,247,0.05)">
+          <div style="font-size:24px;margin-bottom:8px">⭐</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px">Pro <span class="badge badge-blue">Popular</span></div>
+          <div style="font-size:13px;color:var(--text-3);margin-bottom:1rem">Full features</div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Max Jobs</span><span style="font-weight:600">Unlimited</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Clients</span><span style="font-weight:600">Unlimited</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">AI Features</span><span class="badge badge-green">Yes</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Price</span><span style="font-weight:700;color:var(--accent)">$49/mo</span></div>
+        </div>
+        <div class="card" style="border-color:rgba(168,85,247,0.3)">
+          <div style="font-size:24px;margin-bottom:8px">🏢</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:4px">Enterprise</div>
+          <div style="font-size:13px;color:var(--text-3);margin-bottom:1rem">Custom solutions</div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Everything in Pro</span><span class="badge badge-green">✓</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Custom Branding</span><span class="badge badge-green">✓</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Dedicated Support</span><span class="badge badge-green">✓</span></div>
+          <div class="stat-row"><span style="font-size:13px;color:var(--text-2)">Price</span><span style="font-weight:700;color:var(--purple)">Custom</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="section-title">System Settings</div>
+      <div class="section-sub">Platform configuration</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">General</div></div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div><label class="form-label">Platform Name</label><input type="text" value="ContractorPro AI" style="width:100%" /></div>
+            <div><label class="form-label">Support Email</label><input type="text" value="support@contractorpro.ai" style="width:100%" /></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;font-weight:500">Allow New Signups</div><div style="font-size:11px;color:var(--text-3)">Enable public registration</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;font-weight:500">Maintenance Mode</div><div style="font-size:11px;color:var(--text-3)">Block all user logins</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <button class="btn btn-primary" onclick="showToast('Settings saved ✓')">Save Settings</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Admin Credentials</div></div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div><label class="form-label">Admin Email</label><input type="email" id="admin-email-input" value="admin@contractorpro.ai" style="width:100%" /></div>
+            <div><label class="form-label">New Password</label><input type="password" id="admin-pass-input" placeholder="Enter new password" style="width:100%" /></div>
+            <button class="btn btn-primary" onclick="updateAdminCreds()">Update Credentials</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS PAGE -->
+    <div class="page" id="page-logs">
+      <div class="section-title">Activity Logs</div>
+      <div class="section-sub">All system events</div>
+      <div class="card">
+        <div id="logs-list" style="display:flex;flex-direction:column;gap:0">
+          <div style="text-align:center;padding:2rem;color:var(--text-3)">No logs yet</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div id="modal-add-user" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div style="font-size:14px;font-weight:600">➕ Add New User</div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--text-3);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div><label class="form-label">Full Name</label><input type="text" id="new-name" style="width:100%" placeholder="Jake Reynolds" /></div>
+      <div><label class="form-label">Email</label><input type="email" id="new-email" style="width:100%" placeholder="user@email.com" /></div>
+      <div><label class="form-label">Password</label><input type="password" id="new-pass" style="width:100%" placeholder="Min 6 characters" /></div>
+      <div><label class="form-label">Company</label><input type="text" id="new-company" style="width:100%" placeholder="Company name" /></div>
+      <div><label class="form-label">Plan</label>
+        <select id="new-plan" style="width:100%"><option>Pro</option><option>Free</option><option>Enterprise</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="admin-toast"></div>
+
+<script>
+// ── AUTH GUARD ────────────────────────────────────────────────
+(function() {
+  if (localStorage.getItem('cpro_auth') !== '1' || localStorage.getItem('cpro_role') !== 'admin') {
+    window.location.href = 'index.html';
+  }
+})();
+
+// ── NAVIGATION ────────────────────────────────────────────────
+const pages = ['overview','users','accounts','settings','logs'];
+function navigate(page) {
+  pages.forEach(p => {
+    const el = document.getElementById('page-'+p);
+    if (el) el.classList.toggle('active', p === page);
+  });
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.getAttribute('onclick') === "navigate('"+page+"')");
+  });
+  document.getElementById('page-title').textContent = {
+    overview:'Admin Overview', users:'User Management', accounts:'Account Plans',
+    settings:'System Settings', logs:'Activity Logs'
+  }[page] || page;
+  if (page === 'users') renderUsers();
+  if (page === 'logs')  renderLogs();
+}
+
+// ── USERS STORAGE ─────────────────────────────────────────────
+function getUsers() {
+  const stored = localStorage.getItem('cpro_all_users');
+  let users = stored ? JSON.parse(stored) : [];
+  // Always include demo user
+  const hasDemo = users.find(u => u.email === 'demo@contractorpro.ai');
+  if (!hasDemo) {
+    users.push({ name:'Jake Reynolds', email:'demo@contractorpro.ai', pass:'demo1234', company:'Reynolds Contracting Co.', plan:'Pro', role:'user', status:'Active', joined: new Date().toLocaleDateString() });
+    saveUsers(users);
+  }
+  return users;
+}
+function saveUsers(users) {
+  localStorage.setItem('cpro_all_users', JSON.stringify(users));
+}
+
+// ── RENDER USERS TABLE ────────────────────────────────────────
+function renderUsers() {
+  const q = (document.getElementById('user-search')?.value || '').toLowerCase();
+  const users = getUsers().filter(u => !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  const tbody = document.getElementById('users-table-body');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-3)">No users found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map((u,i) => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(79,142,247,0.2);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <span style="font-weight:500">${u.name}</span>
+      </div></td>
+      <td style="color:var(--text-2)">${u.email}</td>
+      <td style="color:var(--text-2)">${u.company || '—'}</td>
+      <td><span class="badge ${u.plan==='Pro'?'badge-blue':u.plan==='Enterprise'?'badge-purple':'badge-gray'}">${u.plan}</span></td>
+      <td><span class="badge ${u.role==='admin'?'badge-red':'badge-green'}">${u.role||'user'}</span></td>
+      <td><span class="badge ${u.status==='Active'||!u.status?'badge-green':'badge-red'}">${u.status||'Active'}</span></td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="toggleUserStatus(${i})">
+            ${u.status==='Suspended'?'Activate':'Suspend'}
+          </button>
+          <button class="btn btn-sm" style="background:rgba(239,68,68,0.15);color:var(--red);border:none" onclick="deleteUser(${i})">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  // Update count badge
+  document.getElementById('users-count').textContent = users.length;
+  document.getElementById('stat-users').textContent = users.length;
+}
+
+// ── OVERVIEW USERS LIST ───────────────────────────────────────
+function renderOverview() {
+  const users = getUsers();
+  const el = document.getElementById('overview-users-list');
+  if (!users.length) { el.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-3)">No users yet</div>'; return; }
+  el.innerHTML = users.map(u => `
+    <div style="display:flex;align-items:center;gap:10px;padding:0.65rem 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+      <div style="width:30px;height:30px;border-radius:50%;background:rgba(79,142,247,0.2);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text-3)">${u.email}</div></div>
+      <span class="badge ${u.plan==='Pro'?'badge-blue':'badge-gray'}">${u.plan}</span>
+    </div>`).join('');
+  document.getElementById('stat-users').textContent = users.length;
+  document.getElementById('users-count').textContent = users.length;
+}
+
+// ── ADD USER ──────────────────────────────────────────────────
+function openAddUserModal() {
+  document.getElementById('modal-add-user').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modal-add-user').style.display = 'none';
+}
+function submitAddUser() {
+  const name    = document.getElementById('new-name').value.trim();
+  const email   = document.getElementById('new-email').value.trim().toLowerCase();
+  const pass    = document.getElementById('new-pass').value;
+  const company = document.getElementById('new-company').value.trim();
+  const plan    = document.getElementById('new-plan').value;
+  if (!name || !email || !pass) { showToast('Fill all required fields', 'var(--red)'); return; }
+  const users = getUsers();
+  if (users.find(u => u.email === email)) { showToast('Email already exists', 'var(--red)'); return; }
+  users.push({ name, email, pass, company, plan, role:'user', status:'Active', joined: new Date().toLocaleDateString() });
+  saveUsers(users);
+  addLog('User added: ' + email);
+  closeModal();
+  renderUsers();
+  showToast('✓ User "' + name + '" added');
+}
+
+// ── SUSPEND / DELETE ──────────────────────────────────────────
+function toggleUserStatus(i) {
+  const users = getUsers();
+  users[i].status = users[i].status === 'Suspended' ? 'Active' : 'Suspended';
+  saveUsers(users);
+  addLog((users[i].status === 'Suspended' ? 'Suspended' : 'Activated') + ' user: ' + users[i].email);
+  renderUsers();
+  showToast('✓ User ' + users[i].status);
+}
+function deleteUser(i) {
+  const users = getUsers();
+  const u = users[i];
+  if (!confirm('Delete user "' + u.name + '"?')) return;
+  users.splice(i, 1);
+  saveUsers(users);
+  addLog('Deleted user: ' + u.email);
+  renderUsers();
+  showToast('✓ User deleted', 'var(--red)');
+}
+function addTestUser() {
+  const users = getUsers();
+  const n = users.length + 1;
+  users.push({ name:'Test User '+n, email:'test'+n+'@example.com', pass:'test1234', company:'Test Co.', plan:'Free', role:'user', status:'Active', joined: new Date().toLocaleDateString() });
+  saveUsers(users);
+  addLog('Test user added: test'+n+'@example.com');
+  renderOverview();
+  showToast('✓ Test user added');
+}
+function clearAllUsers() {
+  if (!confirm('Delete ALL users? This cannot be undone.')) return;
+  localStorage.removeItem('cpro_all_users');
+  addLog('All users cleared by admin');
+  renderUsers();
+  renderOverview();
+  showToast('All users cleared', 'var(--red)');
+}
+
+// ── LOGS ──────────────────────────────────────────────────────
+function addLog(msg) {
+  const logs = JSON.parse(localStorage.getItem('cpro_logs') || '[]');
+  logs.unshift({ msg, time: new Date().toLocaleTimeString() });
+  if (logs.length > 50) logs.pop();
+  localStorage.setItem('cpro_logs', JSON.stringify(logs));
+}
+function renderLogs() {
+  const logs = JSON.parse(localStorage.getItem('cpro_logs') || '[]');
+  const el = document.getElementById('logs-list');
+  if (!logs.length) { el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-3)">No activity yet</div>'; return; }
+  el.innerHTML = logs.map(l => `
+    <div style="display:flex;gap:12px;padding:0.65rem 0;border-bottom:0.5px solid rgba(255,255,255,0.04);font-size:13px">
+      <span style="color:var(--text-3);min-width:80px;font-size:11px">${l.time}</span>
+      <span>${l.msg}</span>
+    </div>`).join('');
+}
+
+// ── UPDATE ADMIN CREDS ────────────────────────────────────────
+function updateAdminCreds() {
+  const email = document.getElementById('admin-email-input').value.trim();
+  const pass  = document.getElementById('admin-pass-input').value;
+  if (!email) { showToast('Email required', 'var(--red)'); return; }
+  showToast('✓ Admin credentials updated');
+  addLog('Admin credentials updated');
+}
+
+// ── SIGN OUT ──────────────────────────────────────────────────
+function doSignOut() {
+  localStorage.removeItem('cpro_auth');
+  localStorage.removeItem('cpro_user');
+  localStorage.removeItem('cpro_role');
+  window.location.href = 'index.html';
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg, color) {
+  const t = document.getElementById('admin-toast');
+  t.textContent = msg;
+  t.style.background = color || 'var(--green)';
+  t.style.display = 'block';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.style.display = 'none', 400); }, 2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  addLog('Admin logged in');
+  renderOverview();
+});
+</script>
+</body>
+</html>

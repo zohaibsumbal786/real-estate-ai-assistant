@@ -1,0 +1,2152 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContractorPro AI – Business OS for Contractors</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0b0d;
+    --bg-2: #111318;
+    --bg-3: #1a1d25;
+    --bg-4: #22263a;
+    --border: rgba(255,255,255,0.08);
+    --border-2: rgba(255,255,255,0.14);
+    --text: #f1f2f4;
+    --text-2: #9ba3b5;
+    --text-3: #5c6478;
+    --accent: #4f8ef7;
+    --accent-2: #3a7de8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+    --font: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --r: 8px;
+    --r-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(255,255,255,0.06);
+  }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg-2);
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 0 0 1rem;
+  }
+  .logo {
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 10px; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; margin-top: 1px; }
+  .nav-section { padding: 0.4rem 0.75rem 0.25rem; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 0.55rem 1rem;
+    margin: 1px 0.5rem;
+    border-radius: var(--r);
+    font-size: 13.5px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--bg-3); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .nav-icon { width: 16px; text-align: center; font-size: 15px; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 20px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .user-card {
+    display: flex; align-items: center; gap: 9px;
+    padding: 0.4rem 0;
+    cursor: pointer;
+  }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff;
+    flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 500; }
+  .user-plan { font-size: 11px; color: var(--text-3); }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+
+  /* TOPBAR */
+  .topbar {
+    height: 54px; min-height: 54px;
+    background: var(--bg-2);
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--r);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-2); }
+  .btn-ghost { background: transparent; color: var(--text-2); border: 0.5px solid var(--border-2); }
+  .btn-ghost:hover { background: var(--bg-3); color: var(--text); }
+  .btn-sm { padding: 0.3rem 0.65rem; font-size: 12px; }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 1.25rem;
+  }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .card-title { font-size: 14px; font-weight: 600; }
+  .card-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+  /* METRIC CARDS */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .metric-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 1.1rem 1.25rem;
+  }
+  .metric-label { font-size: 12px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .metric-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .metric-change { font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .metric-up { color: var(--green); }
+  .metric-down { color: var(--red); }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .col-span-2 { grid-column: span 2; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 0.6rem 0.75rem; text-align: left; font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 0.5px solid var(--border); }
+  td { padding: 0.75rem; border-bottom: 0.5px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .badge-teal { background: rgba(20,184,166,0.15); color: var(--teal); }
+  .badge-gray { background: rgba(255,255,255,0.08); color: var(--text-2); }
+
+  /* PIPELINE */
+  .pipeline { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 0.5rem; }
+  .pipeline-col { min-width: 200px; width: 200px; flex-shrink: 0; }
+  .pipeline-header {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-3); margin-bottom: 8px; padding: 0.4rem 0.6rem;
+    border-radius: var(--r); display: flex; align-items: center; justify-content: space-between;
+  }
+  .pipeline-card {
+    background: var(--bg-2); border: 0.5px solid var(--border);
+    border-radius: var(--r); padding: 0.75rem; margin-bottom: 8px;
+    cursor: grab;
+  }
+  .pipeline-card:hover { border-color: var(--border-2); }
+  .pipeline-card-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .pipeline-card-detail { font-size: 11px; color: var(--text-3); }
+  .pipeline-card-value { font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 6px; }
+
+  /* SEARCH / INPUT */
+  .input-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  input[type="text"], input[type="email"], input[type="number"], select, textarea {
+    background: var(--bg-3); border: 0.5px solid var(--border-2);
+    border-radius: var(--r); padding: 0.5rem 0.75rem;
+    font-size: 13px; color: var(--text); font-family: var(--font);
+    outline: none; transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input[type="text"] { flex: 1; }
+  .input-icon-wrap { position: relative; flex: 1; }
+  .input-icon-wrap input { width: 100%; padding-left: 2.25rem; }
+  .input-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 14px; pointer-events: none; }
+
+  /* TIMELINE */
+  .timeline-item { display: flex; gap: 12px; padding: 0.75rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+  .timeline-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+  .timeline-body { flex: 1; }
+  .timeline-title { font-size: 13px; font-weight: 500; }
+  .timeline-time { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+  /* AI ASSISTANT */
+  .chat-messages { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem; }
+  .chat-msg { display: flex; gap: 10px; }
+  .chat-msg.user { flex-direction: row-reverse; }
+  .chat-bubble {
+    max-width: 75%;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--r-lg);
+    font-size: 13px; line-height: 1.5;
+  }
+  .chat-msg.ai .chat-bubble { background: var(--bg-3); border: 0.5px solid var(--border); color: var(--text); }
+  .chat-msg.user .chat-bubble { background: var(--accent); color: #fff; }
+  .chat-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+  .chat-ai-avatar { background: rgba(79,142,247,0.2); color: var(--accent); }
+  .chat-user-avatar { background: var(--bg-4); color: var(--text-2); }
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row input { flex: 1; }
+  .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); display: inline-block; margin: 0 2px; animation: blink 1.2s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+
+  /* SCHEDULE */
+  .schedule-grid { display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 0; border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; }
+  .sched-header { background: var(--bg-3); padding: 0.5rem 0.6rem; font-size: 11px; font-weight: 600; color: var(--text-3); text-align: center; border-bottom: 0.5px solid var(--border); }
+  .sched-time { background: var(--bg-3); padding: 0.5rem 0.4rem; font-size: 10px; color: var(--text-3); text-align: right; border-right: 0.5px solid var(--border); border-bottom: 0.5px solid rgba(255,255,255,0.03); }
+  .sched-cell { border-right: 0.5px solid rgba(255,255,255,0.03); border-bottom: 0.5px solid rgba(255,255,255,0.03); min-height: 36px; position: relative; padding: 2px; }
+  .sched-event { border-radius: 4px; padding: 3px 6px; font-size: 10px; font-weight: 500; line-height: 1.3; }
+  .sched-event-blue { background: rgba(79,142,247,0.25); color: var(--accent); }
+  .sched-event-green { background: rgba(34,197,94,0.2); color: var(--green); }
+  .sched-event-amber { background: rgba(245,158,11,0.2); color: var(--amber); }
+  .sched-event-purple { background: rgba(168,85,247,0.2); color: var(--purple); }
+
+  /* PROGRESS */
+  .progress-bar { background: var(--bg-3); border-radius: 20px; height: 6px; margin-top: 6px; }
+  .progress-fill { height: 100%; border-radius: 20px; transition: width 0.4s; }
+  .progress-blue { background: var(--accent); }
+  .progress-green { background: var(--green); }
+  .progress-amber { background: var(--amber); }
+
+  /* INVOICE */
+  .invoice-preview {
+    background: #fff; color: #111;
+    border-radius: var(--r-lg);
+    padding: 2rem;
+    font-size: 13px;
+  }
+  .invoice-preview h1 { font-size: 24px; font-weight: 700; color: #111; }
+  .invoice-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
+  .invoice-total { font-size: 18px; font-weight: 700; color: #111; }
+
+  /* NOTIFICATION DOT */
+  .notif-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; margin-left: 4px; vertical-align: middle; }
+
+  /* STAT ROW */
+  .stat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { font-size: 13px; color: var(--text-2); }
+  .stat-val { font-size: 13px; font-weight: 600; }
+
+  /* FORM */
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text-2); margin-bottom: 5px; display: block; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--text-3); margin-bottom: 1.25rem; }
+
+  /* STEPS */
+  .steps { display: flex; gap: 0; margin-bottom: 1.5rem; }
+  .step { flex: 1; display: flex; align-items: center; }
+  .step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .step.done .step-circle { background: var(--green); border-color: var(--green); color: #fff; }
+  .step.active .step-circle { border-color: var(--accent); color: var(--accent); }
+  .step-label { font-size: 11px; margin-left: 6px; color: var(--text-3); }
+  .step.active .step-label { color: var(--text); font-weight: 500; }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 6px; }
+
+  /* CHART CONTAINER */
+  .chart-wrap { position: relative; height: 200px; }
+
+  /* SCORE */
+  .score-ring { width: 60px; height: 60px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .sidebar.mobile-open { display: flex; position: fixed; left: 0; top: 0; z-index: 900; height: 100vh; box-shadow: 8px 0 32px rgba(0,0,0,0.5); }
+    .mobile-overlay { display: block !important; }
+    .hamburger { display: flex !important; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .col-span-2 { grid-column: span 1; }
+    .topbar-title { font-size: 13px; }
+  }
+  .hamburger { display: none; background: none; border: none; color: var(--text-2); cursor: pointer; padding: 6px; border-radius: var(--r); font-size: 20px; margin-right: 4px; }
+  .hamburger:hover { background: var(--bg-3); }
+  .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 899; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+  /* AI THINKING */
+  .ai-loading { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--text-3); padding: 8px 0; }
+
+  /* ONBOARDING BANNER */
+  .banner { background: linear-gradient(135deg, rgba(79,142,247,0.15) 0%, rgba(168,85,247,0.1) 100%); border: 0.5px solid rgba(79,142,247,0.3); border-radius: var(--r-lg); padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+  .banner-text { flex: 1; }
+  .banner-title { font-size: 14px; font-weight: 600; }
+  .banner-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+  /* TAG */
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--bg-3); border: 0.5px solid var(--border); color: var(--text-2); }
+
+  /* AVATAR STACK */
+  .avatar-stack { display: flex; }
+  .avatar-sm { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--bg-2); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; margin-left: -6px; }
+  .avatar-sm:first-child { margin-left: 0; }
+
+  /* SETTINGS TOGGLE */
+  .settings-toggle {
+    width: 38px; height: 21px; border-radius: 20px;
+    background: var(--border-2); position: relative; cursor: pointer;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .settings-toggle::after {
+    content: ''; width: 17px; height: 17px; border-radius: 50%;
+    background: #fff; position: absolute; left: 2px; top: 2px;
+    transition: left 0.2s;
+  }
+  .settings-toggle.active { background: var(--green); }
+  .settings-toggle.active::after { left: 19px; }
+
+  /* SLIDE IN ANIMATION */
+  @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+  /* NOTIFICATION ITEM HOVER */
+  .notif-item:hover { background: rgba(255,255,255,0.03) !important; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🏗️</div>
+      <div>
+        <div class="logo-text">ContractorPro</div>
+        <div class="logo-sub">AI Platform</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <div class="nav-item active" onclick="navigate('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+  <div class="nav-item" onclick="navigate('crm')"><span class="nav-icon">🎯</span> CRM &amp; Leads <span class="nav-badge">7</span></div>
+  <div class="nav-item" onclick="navigate('clients')"><span class="nav-icon">👥</span> Clients</div>
+  <div class="nav-item" onclick="navigate('jobs')"><span class="nav-icon">🔧</span> Jobs</div>
+  <div class="nav-item" onclick="navigate('schedule')"><span class="nav-icon">📅</span> Schedule</div>
+
+  <div class="nav-section">Finance</div>
+  <div class="nav-item" onclick="navigate('proposals')"><span class="nav-icon">📝</span> Proposals</div>
+  <div class="nav-item" onclick="navigate('invoices')"><span class="nav-icon">💰</span> Invoices <span class="nav-badge">3</span></div>
+  <div class="nav-item" onclick="navigate('estimates')"><span class="nav-icon">🧮</span> Estimates</div>
+
+  <div class="nav-section">Intelligence</div>
+  <div class="nav-item" onclick="navigate('ai')"><span class="nav-icon">🤖</span> AI Assistant</div>
+  <div class="nav-item" onclick="navigate('automation')"><span class="nav-icon">⚡</span> Automations</div>
+  <div class="nav-item" onclick="navigate('reports')"><span class="nav-icon">📈</span> Reports</div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">JR</div>
+      <div>
+        <div class="user-name">Jake Reynolds</div>
+        <div class="user-plan">Pro Plan · Owner</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="hamburger" id="hamburger-btn" onclick="toggleMobileSidebar()">☰</button>
+      <!-- Notification Bell -->
+      <div style="position:relative">
+        <button class="btn btn-ghost btn-sm" id="notif-btn" onclick="toggleNotifPanel()" style="position:relative">
+          🔔 <span class="notif-dot" id="notif-dot"></span>
+        </button>
+        <!-- Notification Dropdown -->
+        <div id="notif-panel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--bg-2);border:0.5px solid var(--border-2);border-radius:var(--r-lg);box-shadow:0 16px 48px rgba(0,0,0,0.5);z-index:500;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:0.5px solid var(--border)">
+            <div style="font-size:13px;font-weight:600">Notifications</div>
+            <button onclick="markAllRead()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer">Mark all read</button>
+          </div>
+          <div id="notif-list" style="max-height:340px;overflow-y:auto">
+            <div class="notif-item unread" onclick="markRead(this)" style="display:flex;gap:10px;padding:0.85rem 1rem;border-bottom:0.5px solid rgba(255,255,255,0.04);cursor:pointer;background:rgba(79,142,247,0.05)">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,0.15);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⚠️</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Invoice #INV-1040 overdue</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Thornton &amp; Assoc. — $3,100 · 6 days late</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">2 hours ago</div>
+              </div>
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px"></div>
+            </div>
+            <div class="notif-item unread" onclick="markRead(this)" style="display:flex;gap:10px;padding:0.85rem 1rem;border-bottom:0.5px solid rgba(255,255,255,0.04);cursor:pointer;background:rgba(79,142,247,0.05)">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,0.15);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🎯</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">3 new leads this week</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Apex Corp (AI: 91%) is highest priority</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">5 hours ago</div>
+              </div>
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px"></div>
+            </div>
+            <div class="notif-item unread" onclick="markRead(this)" style="display:flex;gap:10px;padding:0.85rem 1rem;border-bottom:0.5px solid rgba(255,255,255,0.04);cursor:pointer;background:rgba(79,142,247,0.05)">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(34,197,94,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✓</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Invoice #1042 paid</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Meridian Homes — $4,800 received</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">2 hours ago</div>
+              </div>
+              <div style="width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px"></div>
+            </div>
+            <div class="notif-item" onclick="markRead(this)" style="display:flex;gap:10px;padding:0.85rem 1rem;border-bottom:0.5px solid rgba(255,255,255,0.04);cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(79,142,247,0.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📋</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Proposal viewed — Riverside Commercial</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Opened proposal #P-1041 (3rd time)</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">4 hours ago</div>
+              </div>
+            </div>
+            <div class="notif-item" onclick="markRead(this)" style="display:flex;gap:10px;padding:0.85rem 1rem;cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:50%;background:rgba(168,85,247,0.15);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📸</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Job photos uploaded</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:2px">Carlos Diaz — 412 Elm St · 6 photos</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">8 hours ago</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:0.75rem 1rem;border-top:0.5px solid var(--border);text-align:center">
+            <button onclick="closeNotifPanel()" style="font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer">View all notifications</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openSettingsPanel()">⚙️ Settings</button>
+      <button class="btn btn-primary btn-sm" id="topbar-action" onclick="handleTopAction()">+ New Job</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="banner">
+        <div style="font-size:28px">🚀</div>
+        <div class="banner-text">
+          <div class="banner-title" id="dash-greeting">Welcome! Your dashboard is ready.</div>
+          <div class="banner-sub" id="dash-insight">Add your first job or client to get started.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="navigate('ai')">Ask AI</button>
+      </div>
+
+      <div class="metrics" id="dash-metrics">
+        <div class="metric-card">
+          <div class="metric-label">Revenue (MTD)</div>
+          <div class="metric-value" id="m-revenue" style="color:var(--green)">$0</div>
+          <div class="metric-change" style="color:var(--text-3)">No jobs yet</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Active Jobs</div>
+          <div class="metric-value" id="m-jobs">0</div>
+          <div class="metric-change" style="color:var(--text-3)">Add your first job</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Proposals Sent</div>
+          <div class="metric-value" id="m-proposals">0</div>
+          <div class="metric-change" style="color:var(--text-3)">No proposals yet</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Outstanding</div>
+          <div class="metric-value" id="m-outstanding" style="color:var(--amber)">$0</div>
+          <div class="metric-change" style="color:var(--text-3)">No invoices due</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Revenue Trend</div>
+              <div class="card-sub">Last 6 months</div>
+            </div>
+            <span class="badge badge-green">+23%</span>
+          </div>
+          <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Job Status Overview</div>
+          </div>
+          <div class="chart-wrap"><canvas id="jobsChart"></canvas></div>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem" class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+          </div>
+          <div id="dash-activity">
+            <div style="text-align:center;padding:2rem 1rem;color:var(--text-3)">
+              <div style="font-size:28px;margin-bottom:8px">📋</div>
+              <div style="font-size:13px">No activity yet</div>
+              <div style="font-size:11px;margin-top:4px">Actions will appear here as you use the app</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top Clients by Revenue</div>
+          </div>
+          <div id="dash-top-clients">
+            <div style="text-align:center;padding:2rem 1rem;color:var(--text-3)">
+              <div style="font-size:28px;margin-bottom:8px">👥</div>
+              <div style="font-size:13px">No clients yet</div>
+              <div style="font-size:11px;margin-top:4px"><a onclick="navigate('clients')" style="color:var(--accent);cursor:pointer">Add your first client →</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRM PAGE -->
+    <div class="page" id="page-crm">
+      <div class="section-title">CRM &amp; Lead Pipeline</div>
+      <div class="section-sub">AI-powered lead scoring and opportunity management</div>
+
+      <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric-card"><div class="metric-label">New Leads</div><div class="metric-value" id="crm-new">0</div></div>
+        <div class="metric-card"><div class="metric-label">Qualified</div><div class="metric-value" id="crm-qualified">0</div></div>
+        <div class="metric-card"><div class="metric-label">Close Rate</div><div class="metric-value" id="crm-close">—</div></div>
+        <div class="metric-card"><div class="metric-label">Pipeline Value</div><div class="metric-value" id="crm-value" style="color:var(--accent)">$0</div></div>
+      </div>
+
+      <div class="pipeline" id="crm-pipeline">
+        <div class="pipeline-col">
+          <div class="pipeline-header" style="background:rgba(255,255,255,0.04)">New <span id="cnt-new">0</span></div>
+          <div id="col-new"><div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads yet</div></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-header" style="background:rgba(79,142,247,0.07)">Contacted <span id="cnt-contacted">0</span></div>
+          <div id="col-contacted"><div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads here</div></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-header" style="background:rgba(245,158,11,0.07)">Proposal Sent <span id="cnt-proposal">0</span></div>
+          <div id="col-proposal"><div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads here</div></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-header" style="background:rgba(34,197,94,0.07)">Won ✓ <span id="cnt-won">0</span></div>
+          <div id="col-won"><div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads here</div></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-header" style="background:rgba(239,68,68,0.07)">Lost <span id="cnt-lost">0</span></div>
+          <div id="col-lost"><div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads here</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS PAGE -->
+    <div class="page" id="page-jobs">
+      <div class="section-title">Job Management</div>
+      <div class="section-sub">Track work orders, assign technicians, monitor progress</div>
+
+      <div class="input-row">
+        <div class="input-icon-wrap"><span class="input-icon">🔍</span><input type="text" id="jobs-search" placeholder="Search jobs..." oninput="filterJobs()" /></div>
+        <select id="jobs-status-filter" style="min-width:130px" onchange="filterJobs()"><option value="">All Status</option><option>Scheduled</option><option>In Progress</option><option>Waiting</option><option>Completed</option><option>Overdue</option></select>
+        <button class="btn btn-primary" onclick="openNewJobModal()">+ New Job</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Job #</th>
+              <th>Client</th>
+              <th>Description</th>
+              <th>Assigned To</th>
+              <th>Due Date</th>
+              <th>Value</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="jobs-tbody">
+            <tr id="jobs-empty-row">
+              <td colspan="8" style="text-align:center;padding:3rem 1rem;color:var(--text-3)">
+                <div style="font-size:32px;margin-bottom:8px">🔧</div>
+                <div style="font-size:14px;font-weight:500;margin-bottom:6px">No jobs yet</div>
+                <div style="font-size:12px">Click "+ New Job" to create your first job</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTS PAGE -->
+    <div class="page" id="page-clients">
+      <div class="section-title">Client Management</div>
+      <div class="section-sub">Full client profiles, job history, and communication timeline</div>
+
+      <div class="input-row">
+        <div class="input-icon-wrap"><span class="input-icon">🔍</span><input type="text" id="clients-search" placeholder="Search clients..." oninput="filterClients()" /></div>
+        <button class="btn btn-primary" onclick="openNewClientModal()">+ Add Client</button>
+      </div>
+
+      <div id="clients-grid" class="grid-2" style="gap:1rem">
+        <div id="clients-empty" style="grid-column:span 2;text-align:center;padding:3rem;color:var(--text-3)">
+          <div style="font-size:40px;margin-bottom:10px">👥</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px">No clients yet</div>
+          <div style="font-size:13px;margin-bottom:1rem">Add your first client to get started</div>
+          <button class="btn btn-primary" onclick="openNewClientModal()">+ Add Client</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPOSALS PAGE -->
+    <div class="page" id="page-proposals">
+      <div class="section-title">AI Proposal Generator</div>
+      <div class="section-sub">Generate professional proposals in seconds with AI</div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Generate New Proposal</div><span class="badge badge-purple">AI-Powered</span></div>
+
+          <div class="steps">
+            <div class="step done"><div class="step-circle">✓</div><div class="step-label">Job Details</div></div>
+            <div class="step-line"></div>
+            <div class="step active"><div class="step-circle">2</div><div class="step-label">AI Generate</div></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-circle">3</div><div class="step-label">Review &amp; Send</div></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Client</label>
+            <select style="width:100%"><option>Riverside Commercial Park</option><option>Meridian Homes LLC</option><option>New Client...</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job Type</label>
+            <select style="width:100%"><option>Full Renovation</option><option>HVAC Install</option><option>Electrical</option><option>Plumbing</option><option>Roofing</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job Description</label>
+            <textarea style="width:100%;height:80px;resize:none" placeholder="Describe the scope of work, special requirements, client requests...">Complete renovation of 4,200 sqft commercial space. Includes electrical, plumbing, HVAC, flooring, and interior painting. Client requires ADA compliance and green building certification.</textarea>
+          </div>
+          <div class="form-row">
+            <div>
+              <label class="form-label">Estimated Budget</label>
+              <input type="number" style="width:100%" value="18500" />
+            </div>
+            <div>
+              <label class="form-label">Timeline</label>
+              <input type="text" style="width:100%" value="6 weeks" />
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center" onclick="generateProposal()">🤖 Generate with AI</button>
+        </div>
+
+        <div class="card" id="proposal-preview">
+          <div class="card-header">
+            <div class="card-title">Proposal Preview</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm">📄 PDF</button>
+              <button class="btn btn-primary btn-sm">Send</button>
+            </div>
+          </div>
+          <div id="proposal-content" style="font-size:13px;color:var(--text-2);line-height:1.7">
+            <div style="text-align:center;padding:2rem;color:var(--text-3)">
+              <div style="font-size:32px;margin-bottom:0.5rem">📝</div>
+              Fill in the form and click "Generate with AI" to create your professional proposal.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES PAGE -->
+    <div class="page" id="page-invoices">
+      <div class="section-title">Invoice System</div>
+      <div class="section-sub">Create, send, and track payments — Stripe integrated</div>
+
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label">Total Invoiced</div><div class="metric-value" id="inv-total">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Paid</div><div class="metric-value" id="inv-paid" style="color:var(--green)">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Pending</div><div class="metric-value" id="inv-pending" style="color:var(--amber)">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Overdue</div><div class="metric-value" id="inv-overdue" style="color:var(--red)">$0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">All Invoices</div>
+          <button class="btn btn-primary btn-sm" onclick="openNewInvoiceModal()">+ New Invoice</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Invoice #</th><th>Client</th><th>Description</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="invoices-tbody">
+            <tr>
+              <td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)">
+                <div style="font-size:32px;margin-bottom:8px">💰</div>
+                <div style="font-size:14px;font-weight:500;margin-bottom:6px">No invoices yet</div>
+                <div style="font-size:12px">Click "+ New Invoice" to create your first invoice</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ESTIMATES PAGE -->
+    <div class="page" id="page-estimates">
+      <div class="section-title">AI Estimate Engine</div>
+      <div class="section-sub">AI-powered labor, material, and risk analysis with profit margin recommendations</div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:1rem">
+            <div class="card-header"><div class="card-title">New Estimate</div><span class="badge badge-blue">AI-Assisted</span></div>
+            <div class="form-group">
+              <label class="form-label">Job Type</label>
+              <select style="width:100%" id="est-type" onchange="updateEstimate()">
+                <option>HVAC Installation</option>
+                <option>Electrical Work</option>
+                <option>Plumbing</option>
+                <option>Roofing</option>
+                <option>Interior Painting</option>
+                <option>Full Renovation</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div>
+                <label class="form-label">Square Footage</label>
+                <input type="number" id="sqft" value="2400" style="width:100%" onchange="updateEstimate()" />
+              </div>
+              <div>
+                <label class="form-label">Region</label>
+                <select style="width:100%" onchange="updateEstimate()"><option>Northeast US</option><option>Southeast US</option><option>West Coast</option><option>Midwest</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Complexity</label>
+              <select style="width:100%" id="complexity" onchange="updateEstimate()"><option>Standard</option><option>Complex</option><option>Premium</option></select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="updateEstimate()">🧮 Recalculate Estimate</button>
+          </div>
+        </div>
+
+        <div class="card" id="estimate-result">
+          <div class="card-header"><div class="card-title">Estimate Breakdown</div><span class="badge badge-green">AI Generated</span></div>
+          <div class="stat-row"><span class="stat-label">Labor Cost</span><span class="stat-val" id="est-labor">$8,640</span></div>
+          <div class="stat-row"><span class="stat-label">Materials</span><span class="stat-val" id="est-materials">$5,760</span></div>
+          <div class="stat-row"><span class="stat-label">Equipment</span><span class="stat-val" id="est-equipment">$1,200</span></div>
+          <div class="stat-row"><span class="stat-label">Risk Buffer (10%)</span><span class="stat-val" id="est-risk">$1,560</span></div>
+          <div class="stat-row"><span class="stat-label">Tax</span><span class="stat-val" id="est-tax">$1,248</span></div>
+          <div style="border-top:1px solid var(--border-2);margin:12px 0;padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:600;font-size:14px">Total Estimate</span>
+            <span style="font-size:22px;font-weight:700;color:var(--accent)" id="est-total">$18,408</span>
+          </div>
+          <div style="background:rgba(34,197,94,0.08);border:0.5px solid rgba(34,197,94,0.2);border-radius:var(--r);padding:0.75rem;margin-top:0.5rem">
+            <div style="font-size:12px;color:var(--text-3);margin-bottom:4px">🤖 AI Profit Recommendation</div>
+            <div style="font-size:13px">Suggested markup: <strong>28%</strong> → Quote at <strong id="est-quote">$23,562</strong></div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:3px">Based on regional rates, job complexity, and your historical margins.</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:0.75rem;justify-content:center" onclick="navigate('proposals')">Create Proposal from Estimate →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE PAGE -->
+    <div class="page" id="page-schedule">
+      <div class="section-title">Schedule</div>
+      <div class="section-sub">Team scheduling, job dispatch, and calendar management</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:1rem;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="changeWeek(-1)">← Prev</button>
+        <span style="font-size:14px;font-weight:600;flex:1;text-align:center" id="sched-week-label">June 16 – 20, 2025</span>
+        <button class="btn btn-ghost btn-sm" onclick="changeWeek(1)">Next →</button>
+        <button class="btn btn-primary btn-sm" onclick="openBookJobModal()">+ Book Job</button>
+      </div>
+
+      <div class="card">
+        <div class="schedule-grid">
+          <div class="sched-header"></div>
+          <div class="sched-header">Mon 16</div>
+          <div class="sched-header">Tue 17</div>
+          <div class="sched-header">Wed 18</div>
+          <div class="sched-header">Thu 19</div>
+          <div class="sched-header">Fri 20</div>
+
+          <div class="sched-time">8 AM</div>
+          <div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div>
+
+          <div class="sched-time">10 AM</div>
+          <div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div>
+
+          <div class="sched-time">12 PM</div>
+          <div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div>
+
+          <div class="sched-time">2 PM</div>
+          <div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div>
+
+          <div class="sched-time">4 PM</div>
+          <div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div><div class="sched-cell"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT PAGE -->
+    <div class="page" id="page-ai">
+      <div class="section-title">AI Business Assistant</div>
+      <div class="section-sub">Powered by Claude &amp; GPT-4 — trained on your company data</div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ask Anything</div><span class="badge badge-purple">Live AI</span></div>
+          <div class="chat-messages" id="chat-msgs">
+            <div class="chat-msg ai">
+              <div class="chat-avatar chat-ai-avatar">AI</div>
+              <div class="chat-bubble">Hi! I'm your ContractorPro AI assistant. Ask me anything about your business — jobs, invoices, clients, or revenue.</div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Ask about revenue, jobs, clients, invoices..." onkeydown="if(event.key==='Enter')sendChat()" />
+            <button class="btn btn-primary" onclick="sendChat()">Send</button>
+          </div>
+          <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="quickChat('Which client generated most revenue this month?')">Top client this month</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickChat('What jobs are due this week?')">Jobs due this week</button>
+            <button class="btn btn-ghost btn-sm" onclick="quickChat('Summarize business performance')">Performance summary</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">AI Insights</div></div>
+          <div class="timeline-item">
+            <div class="timeline-icon" style="background:rgba(34,197,94,0.15);color:var(--green)">💡</div>
+            <div class="timeline-body">
+              <div class="timeline-title">Revenue up 23% — driven by commercial jobs</div>
+              <div class="timeline-time">Consider expanding commercial outreach. Commercial jobs average 2.4x residential value.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon" style="background:rgba(239,68,68,0.15);color:var(--red)">⚠️</div>
+            <div class="timeline-body">
+              <div class="timeline-title">Thornton &amp; Assoc. payment risk detected</div>
+              <div class="timeline-time">2nd overdue invoice. AI recommends a call before escalating.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon" style="background:rgba(79,142,247,0.15);color:var(--accent)">📈</div>
+            <div class="timeline-body">
+              <div class="timeline-title">HVAC demand spike in your area</div>
+              <div class="timeline-time">3 HVAC leads in 7 days. Consider running a targeted GMB promotion.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon" style="background:rgba(245,158,11,0.15);color:var(--amber)">🎯</div>
+            <div class="timeline-body">
+              <div class="timeline-title">Proposal #P-1041 viewed 3 times</div>
+              <div class="timeline-time">Riverside Commercial opened it again today. Good time to follow up!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTOMATION PAGE -->
+    <div class="page" id="page-automation">
+      <div class="section-title">Automation Engine</div>
+      <div class="section-sub">Zapier-style workflows — triggers, conditions, actions</div>
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+        <button class="btn btn-primary">+ New Automation</button>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:36px;height:36px;border-radius:var(--r);background:rgba(34,197,94,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600">Invoice Overdue → Send Reminder SMS</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px">Trigger: Invoice overdue by 3 days → Action: Send Twilio SMS + Create follow-up task</div>
+          </div>
+          <span class="badge badge-green">Active</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">Edit</button>
+            <div style="width:36px;height:20px;background:var(--green);border-radius:20px;position:relative;cursor:pointer"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:36px;height:36px;border-radius:var(--r);background:rgba(79,142,247,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">📧</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600">New Lead → Welcome Email + Assign to Pipeline</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px">Trigger: New lead created → Action: Send personalized Resend email + Move to "New" CRM stage</div>
+          </div>
+          <span class="badge badge-green">Active</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">Edit</button>
+            <div style="width:36px;height:20px;background:var(--green);border-radius:20px;position:relative;cursor:pointer"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:36px;height:36px;border-radius:var(--r);background:rgba(168,85,247,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">✅</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600">Job Completed → Auto-Generate Invoice</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px">Trigger: Job status = Completed → Action: Create draft invoice + Notify office manager</div>
+          </div>
+          <span class="badge badge-green">Active</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">Edit</button>
+            <div style="width:36px;height:20px;background:var(--green);border-radius:20px;position:relative;cursor:pointer"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:36px;height:36px;border-radius:var(--r);background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;font-size:18px">👀</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600">Proposal Viewed → Notify Sales Team</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:2px">Trigger: Proposal opened by client → Action: Push notification + Slack alert to Jake R.</div>
+          </div>
+          <span class="badge badge-gray">Paused</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">Edit</button>
+            <div style="width:36px;height:20px;background:var(--border-2);border-radius:20px;position:relative;cursor:pointer"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;left:2px;top:2px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+      <div class="section-title">Reports &amp; Analytics</div>
+      <div class="section-sub">Executive dashboard — revenue, profit, conversion, acquisition</div>
+
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label">YTD Revenue</div><div class="metric-value" id="rep-revenue">$0</div><div class="metric-change" style="color:var(--text-3)">No data yet</div></div>
+        <div class="metric-card"><div class="metric-label">Gross Profit</div><div class="metric-value" id="rep-profit" style="color:var(--green)">$0</div><div class="metric-change" style="color:var(--text-3)">—</div></div>
+        <div class="metric-card"><div class="metric-label">Avg Job Value</div><div class="metric-value" id="rep-avg">$0</div><div class="metric-change" style="color:var(--text-3)">—</div></div>
+        <div class="metric-card"><div class="metric-label">Close Rate</div><div class="metric-value" id="rep-close">—</div><div class="metric-change" style="color:var(--text-3)">—</div></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:1rem">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Revenue by Service Type</div></div>
+          <div class="chart-wrap" id="service-chart-wrap">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-3);font-size:13px">No data yet — add jobs to see chart</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Lead Sources</div></div>
+          <div class="chart-wrap" id="lead-chart-wrap">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-3);font-size:13px">No data yet — add leads to see chart</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Team Performance</div></div>
+        <table>
+          <thead><tr><th>Technician</th><th>Jobs Completed</th><th>Avg Rating</th><th>Revenue Generated</th><th>Utilization</th></tr></thead>
+          <tbody id="team-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-3)">No team data yet — assign technicians to jobs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const pages = ['dashboard','crm','jobs','clients','proposals','invoices','estimates','schedule','ai','automation','reports'];
+const pageTitles = {
+  dashboard:'Dashboard',crm:'CRM & Leads',jobs:'Job Management',clients:'Clients',
+  proposals:'AI Proposal Generator',invoices:'Invoice System',estimates:'AI Estimate Engine',
+  schedule:'Schedule',ai:'AI Business Assistant',automation:'Automation Engine',reports:'Reports'
+};
+const topActions = {
+  dashboard:'+ New Job',crm:'+ New Lead',jobs:'+ New Job',clients:'+ Add Client',
+  proposals:'+ New Proposal',invoices:'+ New Invoice',estimates:'+ New Estimate',
+  schedule:'+ Book Job',ai:'Clear Chat',automation:'+ New Automation',reports:'Export PDF'
+};
+
+function navigate(page) {
+  pages.forEach(p => {
+    const el = document.getElementById('page-'+p);
+    if(el) el.classList.toggle('active', p===page);
+    const nav = document.querySelectorAll('.nav-item');
+    nav.forEach(n => { if(n.getAttribute('onclick')==="navigate('"+p+"')") n.classList.toggle('active',p===page); });
+  });
+  document.getElementById('page-title').textContent = pageTitles[page]||page;
+  document.getElementById('topbar-action').textContent = topActions[page]||'+ New';
+  if(page==='reports') setTimeout(initReportCharts, 100);
+  if(page==='dashboard') setTimeout(initDashCharts, 100);
+  closeMobileSidebar();
+}
+
+function handleTopAction() {
+  const page = document.querySelector('.nav-item.active')?.getAttribute('onclick')?.match(/navigate\('(\w+)'\)/)?.[1] || 'dashboard';
+  const modalMap = {
+    dashboard:  openNewJobModal,
+    jobs:       openNewJobModal,
+    crm:        openNewLeadModal,
+    clients:    openNewClientModal,
+    invoices:   openNewInvoiceModal,
+    proposals:  openNewProposalModal,
+    estimates:  openNewEstimateModal,
+    schedule:   openBookJobModal,
+    automation: openNewAutomationModal,
+    reports:    exportReports,
+    ai:         () => { document.getElementById('chat-msgs').innerHTML = ''; addChatMsg('ai', "Chat cleared! How can I help you?"); showToast('Chat cleared ✓'); },
+  };
+  const fn = modalMap[page];
+  if (fn) fn();
+}
+
+let chatHistory = [
+  {role:'ai', text:"Hi! I'm your ContractorPro AI assistant. Ask me anything about your business — jobs, invoices, clients, or revenue."}
+];
+
+const aiResponses = {
+  'revenue': 'Your MTD revenue is <strong>$84,320</strong>, up 23% from last month. Top earner: Meridian Homes at $32,400. Your best service category is HVAC at 38% of revenue.',
+  'overdue': 'You have 2 overdue invoices totaling <strong>$6,670</strong>: Thornton & Assoc. ($3,100, 6 days late) and Blue Ridge Dev. ($3,570 remaining). Want me to send reminders?',
+  'client': 'Your top client this month is <strong>Meridian Homes LLC</strong> with $32,400 in jobs. They have 3 active projects and are your most reliable payer (avg 4 days to pay).',
+  'job': 'This week you have <strong>4 jobs due</strong>: HVAC at Meridian (Mon), Painting at Pinnacle (Wed), Electrical at Riverside (Thu), and HVAC Follow-up (Fri). Carlos Diaz is your busiest tech.',
+  'performance': 'Business summary: $84K revenue MTD (+23%), 14 active jobs, 44% proposal close rate, $21,450 outstanding. Top insight: Commercial jobs are 2.4x more valuable than residential — expand that channel.',
+  'invoice': 'You have 8 invoices this month: 5 paid ($62,870), 1 pending ($6,800), 2 overdue ($6,670), 1 draft ($4,200). Total invoiced: $80,540.',
+  'lead': 'You have 7 active leads worth $92K combined. Apex Corp ($45K) has 91% AI close probability. I recommend prioritizing that outreach today.',
+};
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  addChatMsg('user', msg);
+
+  const loading = addChatMsg('ai', '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>');
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        system:`You are the AI assistant inside ContractorPro AI, a SaaS platform for contractors. The user is Jake Reynolds, owner of a contracting company. Company data: Revenue MTD: $84,320 (up 23%), Active jobs: 14, Overdue invoices: 2 ($6,670 total), Top client: Meridian Homes ($32,400), Close rate: 44%, Outstanding: $21,450. Answer concisely and helpfully as a business intelligence assistant. Use HTML bold for numbers and key terms. Keep answers under 100 words.`,
+        messages:[{role:"user",content:msg}]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || getFallbackResponse(msg);
+    loading.querySelector('.chat-bubble').innerHTML = text;
+  } catch(e) {
+    loading.querySelector('.chat-bubble').innerHTML = getFallbackResponse(msg);
+  }
+  const msgs = document.getElementById('chat-msgs');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function getFallbackResponse(msg) {
+  const lower = msg.toLowerCase();
+  for(const [key,val] of Object.entries(aiResponses)) {
+    if(lower.includes(key)) return val;
+  }
+  return "I can help you with revenue reports, job status, invoices, lead pipeline, and client history. What would you like to know about your business?";
+}
+
+function addChatMsg(role, html) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'chat-msg '+role;
+  div.innerHTML = `<div class="chat-avatar ${role==='ai'?'chat-ai-avatar':'chat-user-avatar'}">${role==='ai'?'AI':'JR'}</div><div class="chat-bubble">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function quickChat(msg) {
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+async function generateProposal() {
+  const btn = event.target;
+  btn.textContent = '🤖 Generating...';
+  btn.disabled = true;
+  document.getElementById('proposal-content').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--text-3)"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span> AI is writing your proposal...</div>';
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        messages:[{role:"user",content:`Write a professional contractor proposal for: Full renovation of 4,200 sqft commercial space. Client: Riverside Commercial Park. Budget: $18,500. Timeline: 6 weeks. Includes electrical, plumbing, HVAC, flooring, painting, ADA compliance. Format as HTML with sections: Executive Summary, Scope of Work, Deliverables, Timeline, Investment. Use <h3> for headings, <p> for paragraphs. Keep it professional and persuasive. Max 400 words.`}]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || getDefaultProposal();
+    document.getElementById('proposal-content').innerHTML = `<div style="font-size:13px;line-height:1.7;color:var(--text)">${text}</div>`;
+  } catch(e) {
+    document.getElementById('proposal-content').innerHTML = getDefaultProposal();
+  }
+  btn.textContent = '🤖 Generate with AI';
+  btn.disabled = false;
+}
+
+function getDefaultProposal() {
+  return `<div style="color:var(--text);font-size:13px;line-height:1.8">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text)">Executive Summary</h3>
+    <p style="color:var(--text-2);margin-bottom:12px">ContractorPro is pleased to submit this proposal for the complete renovation of Riverside Commercial Park's 4,200 sqft commercial space. Our team will deliver a premium, ADA-compliant renovation within your budget and timeline.</p>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text)">Scope of Work</h3>
+    <p style="color:var(--text-2);margin-bottom:12px">Full electrical rewiring and panel upgrade, commercial plumbing installation, HVAC system, premium flooring (hardwood + tile), interior painting, and ADA accessibility compliance throughout.</p>
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text)">Investment</h3>
+    <p style="color:var(--text-2)">Total project investment: <strong style="color:var(--accent)">$18,500</strong> with flexible payment terms. 30% deposit, 40% at midpoint, 30% on completion.</p>
+  </div>`;
+}
+
+function updateEstimate() {
+  const sqft = parseInt(document.getElementById('sqft')?.value||2400);
+  const type = document.getElementById('est-type')?.value||'HVAC Installation';
+  const complexity = document.getElementById('complexity')?.value||'Standard';
+  const rates = {'HVAC Installation':3.6,'Electrical Work':3.2,'Plumbing':3.0,'Roofing':2.8,'Interior Painting':1.8,'Full Renovation':5.2};
+  const mult = {'Standard':1,'Complex':1.35,'Premium':1.7};
+  const base = (rates[type]||3.6) * sqft * (mult[complexity]||1);
+  const labor = Math.round(base*0.48);
+  const materials = Math.round(base*0.32);
+  const equipment = Math.round(base*0.07);
+  const risk = Math.round((labor+materials+equipment)*0.1);
+  const subtotal = labor+materials+equipment+risk;
+  const tax = Math.round(subtotal*0.08);
+  const total = subtotal+tax;
+  const quote = Math.round(total*1.28);
+  document.getElementById('est-labor').textContent='$'+labor.toLocaleString();
+  document.getElementById('est-materials').textContent='$'+materials.toLocaleString();
+  document.getElementById('est-equipment').textContent='$'+equipment.toLocaleString();
+  document.getElementById('est-risk').textContent='$'+risk.toLocaleString();
+  document.getElementById('est-tax').textContent='$'+tax.toLocaleString();
+  document.getElementById('est-total').textContent='$'+total.toLocaleString();
+  document.getElementById('est-quote').textContent='$'+quote.toLocaleString();
+}
+
+function initDashCharts() {
+  const rc = document.getElementById('revenueChart');
+  const jc = document.getElementById('jobsChart');
+  if(!rc||!jc) return;
+  if(rc._chart) { rc._chart.destroy(); }
+  if(jc._chart) { jc._chart.destroy(); }
+  const style = getComputedStyle(document.documentElement);
+  const textColor = '#9ba3b5';
+  const gridColor = 'rgba(255,255,255,0.05)';
+
+  rc._chart = new Chart(rc, {
+    type:'line',
+    data:{
+      labels:['Jan','Feb','Mar','Apr','May','Jun'],
+      datasets:[{label:'Revenue',data:[52000,61000,58000,72000,68000,84320],borderColor:'#4f8ef7',backgroundColor:'rgba(79,142,247,0.08)',tension:0.4,fill:true,pointRadius:3}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:11},callback:v=>'$'+Math.round(v/1000)+'k'}}}}
+  });
+
+  jc._chart = new Chart(jc, {
+    type:'doughnut',
+    data:{
+      labels:['Completed','In Progress','Scheduled','Waiting','Overdue'],
+      datasets:[{data:[28,6,4,3,2],backgroundColor:['#22c55e','#4f8ef7','#f59e0b','#a855f7','#ef4444'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:textColor,font:{size:11},padding:10}}}}
+  });
+}
+
+function initReportCharts() {
+  const sc = document.getElementById('serviceChart');
+  const lc = document.getElementById('leadChart');
+  if(!sc||!lc) return;
+  if(sc._chart) { sc._chart.destroy(); }
+  if(lc._chart) { lc._chart.destroy(); }
+  const textColor='#9ba3b5';const gridColor='rgba(255,255,255,0.05)';
+  sc._chart = new Chart(sc,{type:'bar',data:{labels:['HVAC','Electrical','Plumbing','Roofing','Painting','Renovation'],datasets:[{data:[156000,94000,72000,54000,36000,82000],backgroundColor:'rgba(79,142,247,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:textColor,font:{size:10}}},y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'k'}}}}});
+  lc._chart = new Chart(lc,{type:'doughnut',data:{labels:['Google My Business','Referral','Angi/HomeAdvisor','Cold Outreach','Social Media'],datasets:[{data:[38,28,18,10,6],backgroundColor:['#4f8ef7','#22c55e','#f59e0b','#a855f7','#14b8a6'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:textColor,font:{size:11},padding:10}}}}});
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initDashCharts, 200);
+  updateNotifBadge();
+  // Render all data from localStorage
+  renderJobsTable();
+  renderClientsGrid();
+  renderInvoicesTable();
+  renderCRMPipeline();
+  renderSchedule();
+  updateDashMetrics();
+});
+
+// ── MOBILE SIDEBAR ───────────────────────────────────────────────
+function toggleMobileSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('mobile-overlay');
+  sidebar.classList.toggle('mobile-open');
+  overlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
+}
+function closeMobileSidebar() {
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('mobile-overlay').style.display = 'none';
+}
+
+// ── JOB SEARCH FILTER ───────────────────────────────────────────
+function filterJobs() {
+  const q = (document.getElementById('jobs-search')?.value || '').toLowerCase();
+  const st = (document.getElementById('jobs-status-filter')?.value || '').toLowerCase();
+  const rows = document.querySelectorAll('#jobs-tbody tr');
+  let visible = 0;
+  rows.forEach(row => {
+    const text = (row.dataset.search || '').toLowerCase();
+    const status = (row.dataset.status || '').toLowerCase();
+    const matchQ = !q || text.includes(q);
+    const matchSt = !st || status.includes(st.toLowerCase());
+    row.style.display = matchQ && matchSt ? '' : 'none';
+    if (matchQ && matchSt) visible++;
+  });
+  // empty state
+  let empty = document.getElementById('jobs-empty');
+  if (!empty) {
+    empty = document.createElement('tr');
+    empty.id = 'jobs-empty';
+    empty.innerHTML = '<td colspan="8" style="text-align:center;padding:2rem;color:var(--text-3)">🔍 No jobs found</td>';
+    document.getElementById('jobs-tbody').appendChild(empty);
+  }
+  empty.style.display = visible === 0 ? '' : 'none';
+}
+
+// ── CLIENT SEARCH FILTER ─────────────────────────────────────────
+function filterClients() {
+  const q = (document.getElementById('clients-search')?.value || '').toLowerCase();
+  document.querySelectorAll('#clients-grid .card').forEach(card => {
+    card.style.display = !q || card.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ── JOB VIEW MODAL ───────────────────────────────────────────────
+function openJobView(id, client, desc, status, value, due, team, badgeClass) {
+  const progress = { 'Completed': 100, 'In Progress': 55, 'Scheduled': 10, 'Waiting Parts': 30, 'Overdue': 70 };
+  const pct = progress[status] || 0;
+  const nextStatus = { 'Scheduled':'In Progress', 'In Progress':'Completed', 'Waiting Parts':'In Progress', 'Overdue':'In Progress' };
+  const next = nextStatus[status];
+  document.getElementById('job-view-body').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap">
+      <div>
+        <div style="font-size:11px;color:var(--text-3);font-family:var(--mono);margin-bottom:4px">#${id}</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:6px">${desc}</div>
+        <div style="font-size:13px;color:var(--text-2)">Client: <strong style="color:var(--text)">${client}</strong></div>
+      </div>
+      <span class="badge ${badgeClass}" style="font-size:12px;padding:4px 12px">${status}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem">
+      <div style="background:var(--bg-3);padding:0.85rem;border-radius:var(--r);text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:4px">Value</div>
+        <div style="font-size:18px;font-weight:700;color:var(--accent)">${value}</div>
+      </div>
+      <div style="background:var(--bg-3);padding:0.85rem;border-radius:var(--r);text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:4px">Due Date</div>
+        <div style="font-size:14px;font-weight:600">${due}</div>
+      </div>
+      <div style="background:var(--bg-3);padding:0.85rem;border-radius:var(--r);text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;margin-bottom:4px">Team</div>
+        <div style="font-size:13px;font-weight:600">${team}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);margin-bottom:6px"><span>Progress</span><span>${pct}%</span></div>
+      <div class="progress-bar" style="height:8px"><div class="progress-fill progress-blue" style="width:${pct}%"></div></div>
+    </div>
+    ${next ? `<div style="margin-bottom:1.5rem"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="updateJobStatus('${id}','${next}')">→ Mark as ${next}</button></div>` : status==='Completed' ? `<div style="margin-bottom:1.5rem;text-align:center;padding:0.75rem;background:rgba(34,197,94,0.1);border-radius:var(--r);color:var(--green);font-size:13px;font-weight:600">✓ Job Completed</div>` : ''}
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Activity Log</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--text-3);min-width:80px">Current</span><span>Status: <strong>${status}</strong></span></div>
+        <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--text-3);min-width:80px">Team</span><span>${team}</span></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Notes</div>
+      <textarea style="width:100%;height:70px;resize:none;font-size:13px" placeholder="Add job notes..."></textarea>
+    </div>
+  `;
+  document.getElementById('modal-job-view').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function updateJobStatus(id, newStatus) {
+  const jobs = getData('cpro_jobs');
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  job.status = newStatus;
+  saveData('cpro_jobs', jobs);
+  addActivity('🔧', `Job #${id} → ${newStatus}`, job.client);
+  showToast(`✓ Job #${id} marked as ${newStatus}`);
+  document.getElementById('modal-job-view').style.display = 'none';
+  document.body.style.overflow = '';
+  renderJobsTable();
+  updateDashMetrics();
+}
+
+// ── INVOICE VIEW MODAL ───────────────────────────────────────────
+function openInvoiceView(id, client, desc, amount, due, status, badgeClass) {
+  document.getElementById('invoice-view-body').innerHTML = `
+    <div style="background:#fff;color:#111;border-radius:var(--r-lg);padding:2rem;font-size:13px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#111;margin-bottom:4px">INVOICE</div>
+          <div style="font-size:13px;color:#666">#${id}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:15px;font-weight:700;color:#111">Reynolds Contracting Co.</div>
+          <div style="font-size:12px;color:#666;margin-top:3px">88 Reynolds Ave, Boston, MA</div>
+          <div style="font-size:12px;color:#666">CTR-2022-08841</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;margin-bottom:6px">Bill To</div>
+          <div style="font-weight:600;color:#111">${client}</div>
+          <div style="color:#666;margin-top:2px">Project: ${desc}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;margin-bottom:6px">Invoice Details</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#666">Issue Date:</span><span>Jun 1, 2025</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:#666">Due Date:</span><span style="font-weight:600">${due}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#666">Status:</span><span class="badge ${badgeClass}">${status}</span></div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem">
+        <thead><tr style="border-bottom:2px solid #eee"><th style="text-align:left;padding:8px 0;font-size:11px;color:#999;text-transform:uppercase">Description</th><th style="text-align:right;padding:8px 0;font-size:11px;color:#999;text-transform:uppercase">Amount</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#333">${desc}</td><td style="padding:10px 0;text-align:right;font-weight:600">${amount}</td></tr>
+          <tr><td style="padding:8px 0;color:#999;font-size:12px">Labor &amp; Materials</td><td style="padding:8px 0;text-align:right;color:#999;font-size:12px">Included</td></tr>
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="min-width:200px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#666">Subtotal</span><span>${amount}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#666">Tax (8%)</span><span>Included</span></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:2px solid #111;font-size:16px;font-weight:800"><span>Total Due</span><span>${amount}</span></div>
+        </div>
+      </div>
+      <div style="margin-top:2rem;padding:1rem;background:#f8f8f8;border-radius:8px;font-size:12px;color:#666;text-align:center">
+        Payment via Stripe · Bank transfer · Check<br/>
+        <strong style="color:#111">Thank you for your business!</strong>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-invoice-view').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+// ── SCHEDULE WEEK NAVIGATION ─────────────────────────────────────
+let schedWeekOffset = 0;
+function changeWeek(dir) {
+  schedWeekOffset += dir;
+  const base = new Date(2025, 5, 16); // Jun 16
+  base.setDate(base.getDate() + schedWeekOffset * 7);
+  const end = new Date(base); end.setDate(end.getDate() + 4);
+  const opts = { month: 'short', day: 'numeric' };
+  const startStr = base.toLocaleDateString('en-US', opts);
+  const endStr = end.toLocaleDateString('en-US', { ...opts, year: 'numeric' });
+  document.getElementById('sched-week-label').textContent = `${startStr} – ${endStr}`;
+  // update day headers
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  const headers = document.querySelectorAll('.sched-header:not(:first-child)');
+  headers.forEach((h, i) => {
+    const d = new Date(base); d.setDate(d.getDate() + i);
+    h.textContent = `${days[i]} ${d.getDate()}`;
+  });
+  showToast(`Week of ${startStr}`, 'info');
+}
+
+// ── REPORTS EXPORT PDF ───────────────────────────────────────────
+function exportReports() {
+  showToast('📄 Generating PDF report...', 'info');
+  setTimeout(() => {
+    window.print();
+  }, 500);
+}
+
+// ── PIPELINE DRAG AND DROP ───────────────────────────────────────
+let dragCard = null;
+function initDragDrop() {
+  document.querySelectorAll('.pipeline-card').forEach(card => {
+    card.setAttribute('draggable', 'true');
+    card.addEventListener('dragstart', e => {
+      dragCard = card;
+      card.style.opacity = '0.5';
+    });
+    card.addEventListener('dragend', () => {
+      card.style.opacity = '1';
+      dragCard = null;
+    });
+  });
+  document.querySelectorAll('.pipeline-col').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.style.background = 'rgba(79,142,247,0.05)'; });
+    col.addEventListener('dragleave', () => { col.style.background = ''; });
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.style.background = '';
+      if (dragCard) {
+        const header = col.querySelector('.pipeline-header');
+        col.insertBefore(dragCard, header ? header.nextSibling : col.firstChild);
+        const stageName = header ? header.textContent.trim().replace(/\d+/, '').trim() : '';
+        showToast(`Lead moved to "${stageName}" ✓`);
+      }
+    });
+  });
+}
+
+// ── CLIENTS GRID ID ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.querySelector('#page-clients .grid-2');
+  if (grid) grid.id = 'clients-grid';
+  initDragDrop();
+});
+const clientData = {
+  meridian: {
+    name: 'Meridian Homes LLC',
+    type: 'Commercial',
+    since: '2022',
+    jobs: 12,
+    status: 'VIP',
+    statusClass: 'badge-green',
+    initials: 'M',
+    color: 'rgba(79,142,247,0.2)',
+    textColor: 'var(--accent)',
+    email: 'contact@meridianhomes.com',
+    phone: '+1 (555) 210-4400',
+    address: '142 Meridian Blvd, Boston, MA 02101',
+    revenue: '$32,400',
+    outstanding: '$4,800',
+    activeJobs: 3,
+    avgPay: '4 days',
+    tags: ['HVAC','Electrical','Plumbing'],
+    history: [
+      { job:'#J-1084', desc:'HVAC Installation — Master Suite', value:'$9,800', status:'In Progress', statusClass:'badge-blue', date:'Jun 20, 2025' },
+      { job:'#J-1072', desc:'Electrical Panel Upgrade', value:'$6,200', status:'Completed', statusClass:'badge-green', date:'May 10, 2025' },
+      { job:'#J-1061', desc:'Plumbing Overhaul', value:'$8,100', status:'Completed', statusClass:'badge-green', date:'Apr 2, 2025' },
+      { job:'#J-1048', desc:'Interior Painting', value:'$4,300', status:'Completed', statusClass:'badge-green', date:'Feb 15, 2025' },
+    ],
+    notes: 'Preferred client — always pays on time. Decision maker is Lisa Chen (GM). Prefers email communication. Has 2 more properties lined up for Q3.'
+  },
+  pinnacle: {
+    name: 'Pinnacle Properties',
+    type: 'Residential',
+    since: '2023',
+    jobs: 8,
+    status: 'Active',
+    statusClass: 'badge-blue',
+    initials: 'P',
+    color: 'rgba(168,85,247,0.2)',
+    textColor: 'var(--purple)',
+    email: 'info@pinnacleprop.com',
+    phone: '+1 (555) 334-7720',
+    address: '88 Pinnacle Dr, Providence, RI 02903',
+    revenue: '$21,200',
+    outstanding: '$0',
+    activeJobs: 2,
+    avgPay: '6 days',
+    tags: ['Painting','Flooring'],
+    history: [
+      { job:'#J-1083', desc:'Interior Painting — 3 Bedroom', value:'$4,200', status:'Scheduled', statusClass:'badge-amber', date:'Jun 18, 2025' },
+      { job:'#J-1070', desc:'Hardwood Flooring Install', value:'$7,800', status:'Completed', statusClass:'badge-green', date:'May 5, 2025' },
+      { job:'#J-1055', desc:'Exterior Painting', value:'$5,100', status:'Completed', statusClass:'badge-green', date:'Mar 20, 2025' },
+    ],
+    notes: 'Residential portfolio owner. Contact: Tom Walsh. Reliable referral source — sent 2 new clients this year.'
+  },
+  riverside: {
+    name: 'Riverside Commercial',
+    type: 'Commercial',
+    since: '2023',
+    jobs: 6,
+    status: 'Proposal',
+    statusClass: 'badge-amber',
+    initials: 'R',
+    color: 'rgba(20,184,166,0.2)',
+    textColor: 'var(--teal)',
+    email: 'ops@riversidepark.com',
+    phone: '+1 (555) 887-3310',
+    address: '500 Riverside Blvd, Hartford, CT 06103',
+    revenue: '$14,800',
+    outstanding: '$6,800',
+    activeJobs: 1,
+    avgPay: '14 days',
+    tags: ['Electrical','Renovation'],
+    history: [
+      { job:'#J-1082', desc:'Electrical Panel Upgrade', value:'$6,800', status:'Completed', statusClass:'badge-green', date:'Jun 15, 2025' },
+      { job:'#J-1065', desc:'Office Renovation Phase 1', value:'$8,000', status:'Completed', statusClass:'badge-green', date:'Apr 18, 2025' },
+    ],
+    notes: 'Large commercial park — 4 buildings. Full renovation proposal ($18,500) currently under review. Follow up by Jun 22.'
+  },
+  thornton: {
+    name: 'Thornton & Associates',
+    type: 'Residential',
+    since: '2024',
+    jobs: 5,
+    status: 'At Risk',
+    statusClass: 'badge-red',
+    initials: 'T',
+    color: 'rgba(245,158,11,0.2)',
+    textColor: 'var(--amber)',
+    email: 'mike@thorntonassoc.com',
+    phone: '+1 (555) 123-9900',
+    address: '27 Oak Lane, Springfield, MA 01101',
+    revenue: '$9,700',
+    outstanding: '$3,100',
+    activeJobs: 1,
+    avgPay: '21 days',
+    tags: ['Roofing'],
+    history: [
+      { job:'#J-1081', desc:'Roof Repair — Storm Damage', value:'$3,100', status:'Overdue', statusClass:'badge-red', date:'Jun 12, 2025' },
+      { job:'#J-1060', desc:'Gutter Replacement', value:'$2,400', status:'Completed', statusClass:'badge-green', date:'Mar 30, 2025' },
+    ],
+    notes: 'Payment delays on last 2 invoices. Recommend a call before next job. Insurance claim may be involved in storm damage job.'
+  }
+};
+
+function showClientDetail(id) {
+  const c = clientData[id];
+  if (!c) return;
+
+  const historyRows = c.history.map(h => `
+    <tr>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text-3)">${h.job}</td>
+      <td style="color:var(--text-2)">${h.desc}</td>
+      <td style="font-weight:600">${h.value}</td>
+      <td><span class="badge ${h.statusClass}">${h.status}</span></td>
+      <td style="font-size:12px;color:var(--text-3)">${h.date}</td>
+    </tr>`).join('');
+
+  const tagsHtml = c.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+  document.getElementById('client-modal-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:0.5px solid var(--border)">
+      <div style="width:56px;height:56px;border-radius:50%;background:${c.color};color:${c.textColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;flex-shrink:0">${c.initials}</div>
+      <div style="flex:1">
+        <div style="font-size:17px;font-weight:700">${c.name}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:3px">${c.type} · ${c.jobs} jobs · Since ${c.since}</div>
+        <div style="display:flex;gap:6px;margin-top:8px">${tagsHtml}</div>
+      </div>
+      <span class="badge ${c.statusClass}" style="font-size:12px;padding:4px 12px">${c.status}</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem">
+      <div style="background:var(--bg-3);border-radius:var(--r);padding:0.85rem;text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Total Revenue</div>
+        <div style="font-size:18px;font-weight:700;color:var(--green)">${c.revenue}</div>
+      </div>
+      <div style="background:var(--bg-3);border-radius:var(--r);padding:0.85rem;text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Outstanding</div>
+        <div style="font-size:18px;font-weight:700;color:${c.outstanding==='$0'?'var(--text)':'var(--amber)'}">${c.outstanding}</div>
+      </div>
+      <div style="background:var(--bg-3);border-radius:var(--r);padding:0.85rem;text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Active Jobs</div>
+        <div style="font-size:18px;font-weight:700">${c.activeJobs}</div>
+      </div>
+      <div style="background:var(--bg-3);border-radius:var(--r);padding:0.85rem;text-align:center">
+        <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Avg Pay Time</div>
+        <div style="font-size:18px;font-weight:700">${c.avgPay}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Contact Info</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--text-3)">✉️</span><span>${c.email}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--text-3)">📞</span><span>${c.phone}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="color:var(--text-3)">📍</span><span style="color:var(--text-2)">${c.address}</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Notes</div>
+        <div style="font-size:13px;color:var(--text-2);line-height:1.6;background:var(--bg-3);padding:0.75rem;border-radius:var(--r);border:0.5px solid var(--border)">${c.notes}</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">Job History</div>
+      <table style="width:100%">
+        <thead>
+          <tr>
+            <th>Job #</th><th>Description</th><th>Value</th><th>Status</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody>${historyRows}</tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('client-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeClientModal() {
+  document.getElementById('client-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── GENERIC MODAL HELPERS ────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+  document.body.style.overflow = '';
+}
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'success' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--accent)';
+  t.style.display = 'block';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.style.display='none', 400); }, 2800);
+}
+
+// ── NOTIFICATION PANEL ───────────────────────────────────────────
+let notifOpen = false;
+function toggleNotifPanel() {
+  notifOpen = !notifOpen;
+  document.getElementById('notif-panel').style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) {
+    // close settings if open
+    document.getElementById('settings-panel').style.display = 'none';
+  }
+}
+function closeNotifPanel() {
+  notifOpen = false;
+  document.getElementById('notif-panel').style.display = 'none';
+}
+function markRead(item) {
+  item.style.background = 'transparent';
+  const dot = item.querySelector('div[style*="border-radius:50%;background:var(--accent)"]');
+  if (dot) dot.style.display = 'none';
+  item.classList.remove('unread');
+  updateNotifBadge();
+}
+function markAllRead() {
+  document.querySelectorAll('.notif-item.unread').forEach(item => markRead(item));
+  showToast('All notifications marked as read');
+}
+function updateNotifBadge() {
+  const count = document.querySelectorAll('.notif-item.unread').length;
+  const dot = document.getElementById('notif-dot');
+  dot.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+// ── SETTINGS PANEL ───────────────────────────────────────────────
+function openSettingsPanel() {
+  closeNotifPanel();
+  document.getElementById('settings-panel').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeSettingsPanel() {
+  document.getElementById('settings-panel').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function saveSettings() {
+  closeSettingsPanel();
+  showToast('✓ Settings saved successfully');
+}
+function toggleSetting(el) {
+  el.classList.toggle('active');
+}
+function setTheme(theme) {
+  if (theme === 'light') {
+    document.documentElement.style.setProperty('--bg', '#f4f5f7');
+    document.documentElement.style.setProperty('--bg-2', '#ffffff');
+    document.documentElement.style.setProperty('--bg-3', '#f0f1f3');
+    document.documentElement.style.setProperty('--bg-4', '#e4e6eb');
+    document.documentElement.style.setProperty('--border', 'rgba(0,0,0,0.08)');
+    document.documentElement.style.setProperty('--border-2', 'rgba(0,0,0,0.14)');
+    document.documentElement.style.setProperty('--text', '#111318');
+    document.documentElement.style.setProperty('--text-2', '#4a5060');
+    document.documentElement.style.setProperty('--text-3', '#9099ad');
+    document.getElementById('theme-dark').style.borderColor = 'var(--border-2)';
+    document.getElementById('theme-light').style.borderColor = 'var(--accent)';
+  } else {
+    document.documentElement.style.setProperty('--bg', '#0a0b0d');
+    document.documentElement.style.setProperty('--bg-2', '#111318');
+    document.documentElement.style.setProperty('--bg-3', '#1a1d25');
+    document.documentElement.style.setProperty('--bg-4', '#22263a');
+    document.documentElement.style.setProperty('--border', 'rgba(255,255,255,0.08)');
+    document.documentElement.style.setProperty('--border-2', 'rgba(255,255,255,0.14)');
+    document.documentElement.style.setProperty('--text', '#f1f2f4');
+    document.documentElement.style.setProperty('--text-2', '#9ba3b5');
+    document.documentElement.style.setProperty('--text-3', '#5c6478');
+    document.getElementById('theme-dark').style.borderColor = 'var(--accent)';
+    document.getElementById('theme-light').style.borderColor = 'var(--border-2)';
+  }
+}
+
+// close notif panel on outside click
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('notif-panel');
+  const btn   = document.getElementById('notif-btn');
+  if (notifOpen && !panel.contains(e.target) && !btn.contains(e.target)) {
+    closeNotifPanel();
+  }
+});
+
+// ── DATA STORE (localStorage) ────────────────────────────────────
+function getData(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; } }
+function saveData(key, arr) { localStorage.setItem(key, JSON.stringify(arr)); }
+
+// ── NEW JOB MODAL ────────────────────────────────────────────────
+function openNewJobModal() { openModal('modal-new-job'); }
+function submitNewJob() {
+  const title  = document.getElementById('nj-title').value.trim();
+  const client = document.getElementById('nj-client').value;
+  const value  = document.getElementById('nj-value').value || '0';
+  const due    = document.querySelector('#modal-new-job input[type="date"]')?.value || '—';
+  if (!title) { showToast('Job description required', 'error'); return; }
+  const jobs = getData('cpro_jobs');
+  const id = 'J-' + (1000 + jobs.length + 1);
+  jobs.push({ id, title, client, value: parseFloat(value)||0, due, status:'Scheduled', team:'Unassigned', created: new Date().toLocaleDateString() });
+  saveData('cpro_jobs', jobs);
+  addActivity('🔧', `Job #${id} created — ${client}`, title);
+  closeModal('modal-new-job');
+  showToast(`✓ Job "${title}" created`);
+  document.getElementById('nj-title').value = '';
+  document.getElementById('nj-value').value = '';
+  renderJobsTable();
+  updateDashMetrics();
+}
+
+function renderJobsTable() {
+  const jobs = getData('cpro_jobs');
+  const tbody = document.getElementById('jobs-tbody');
+  if (!tbody) return;
+  if (!jobs.length) {
+    tbody.innerHTML = `<tr id="jobs-empty-row"><td colspan="8" style="text-align:center;padding:3rem 1rem;color:var(--text-3)"><div style="font-size:32px;margin-bottom:8px">🔧</div><div style="font-size:14px;font-weight:500;margin-bottom:6px">No jobs yet</div><div style="font-size:12px">Click "+ New Job" to create your first job</div></td></tr>`;
+    return;
+  }
+  const badgeMap = { Scheduled:'badge-amber', 'In Progress':'badge-blue', Completed:'badge-green', Overdue:'badge-red', 'Waiting Parts':'badge-gray' };
+  tbody.innerHTML = jobs.map(j => `
+    <tr data-search="${j.client.toLowerCase()} ${j.title.toLowerCase()}" data-status="${j.status}">
+      <td style="font-family:var(--mono);font-size:12px;color:var(--text-3)">#${j.id}</td>
+      <td><strong style="font-size:13px">${j.client}</strong></td>
+      <td style="color:var(--text-2)">${j.title}</td>
+      <td style="font-size:12px;color:var(--text-2)">${j.team||'—'}</td>
+      <td style="font-size:12px;color:var(--text-2)">${j.due||'—'}</td>
+      <td style="font-weight:600">${j.value ? '$'+Number(j.value).toLocaleString() : '—'}</td>
+      <td><span class="badge ${badgeMap[j.status]||'badge-gray'}">${j.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openJobView('${j.id}','${j.client}','${j.title}','${j.status}','$${Number(j.value).toLocaleString()}','${j.due}','${j.team||"Unassigned"}','${badgeMap[j.status]||"badge-gray"}')">View</button></td>
+    </tr>`).join('');
+}
+
+// ── NEW LEAD MODAL ───────────────────────────────────────────────
+function openNewLeadModal() { openModal('modal-new-lead'); }
+function submitNewLead() {
+  const name    = document.getElementById('nl-name').value.trim();
+  const company = document.getElementById('nl-company')?.value.trim() || '';
+  const value   = document.getElementById('nl-value')?.value || '0';
+  if (!name) { showToast('Contact name required', 'error'); return; }
+  const leads = getData('cpro_leads');
+  leads.push({ name, company, value: parseFloat(value)||0, stage:'New', created: new Date().toLocaleDateString() });
+  saveData('cpro_leads', leads);
+  addActivity('🎯', `New lead added — ${name}`, company);
+  closeModal('modal-new-lead');
+  showToast(`✓ Lead "${name}" added to pipeline`);
+  document.getElementById('nl-name').value = '';
+  renderCRMPipeline();
+  updateDashMetrics();
+}
+
+function renderCRMPipeline() {
+  const leads = getData('cpro_leads');
+  const stages = ['New','Contacted','Proposal Sent','Won','Lost'];
+  const colIds = ['col-new','col-contacted','col-proposal','col-won','col-lost'];
+  const cntIds = ['cnt-new','cnt-contacted','cnt-proposal','cnt-won','cnt-lost'];
+  stages.forEach((stage, i) => {
+    const stageleads = leads.filter(l => l.stage === stage);
+    const col = document.getElementById(colIds[i]);
+    const cnt = document.getElementById(cntIds[i]);
+    if (cnt) cnt.textContent = stageleads.length;
+    if (!col) return;
+    if (!stageleads.length) { col.innerHTML = `<div style="text-align:center;padding:1.5rem 0.5rem;color:var(--text-3);font-size:12px">No leads here</div>`; return; }
+    col.innerHTML = stageleads.map(l => `
+      <div class="pipeline-card" draggable="true">
+        <div class="pipeline-card-name">${l.name}</div>
+        <div class="pipeline-card-detail">${l.company||'—'}</div>
+        <div class="pipeline-card-value">${l.value ? '$'+Number(l.value).toLocaleString() : '—'}</div>
+      </div>`).join('');
+  });
+  // update metrics
+  const total = leads.reduce((s,l) => s + (l.value||0), 0);
+  const el = document.getElementById('crm-value');
+  if (el) el.textContent = '$' + total.toLocaleString();
+  const newEl = document.getElementById('crm-new');
+  if (newEl) newEl.textContent = leads.filter(l=>l.stage==='New').length;
+}
+
+// ── NEW CLIENT MODAL ─────────────────────────────────────────────
+function openNewClientModal() { openModal('modal-new-client'); }
+function submitNewClient() {
+  const name    = document.getElementById('nc-name').value.trim();
+  const type    = document.querySelector('#modal-new-client select')?.value || 'Residential';
+  const phone   = document.getElementById('nc-phone')?.value.trim() || '';
+  const email   = document.getElementById('nc-email')?.value.trim() || '';
+  const address = document.getElementById('nc-address')?.value.trim() || '';
+  if (!name) { showToast('Company name required', 'error'); return; }
+  const clients = getData('cpro_clients');
+  clients.push({ name, type, phone, email, address, revenue:0, jobs:0, outstanding:0, joined: new Date().getFullYear() });
+  saveData('cpro_clients', clients);
+  addActivity('👥', `Client added — ${name}`, type);
+  closeModal('modal-new-client');
+  showToast(`✓ Client "${name}" added`);
+  document.getElementById('nc-name').value = '';
+  renderClientsGrid();
+  updateDashMetrics();
+}
+
+function renderClientsGrid() {
+  const clients = getData('cpro_clients');
+  const grid = document.getElementById('clients-grid');
+  if (!grid) return;
+  if (!clients.length) {
+    grid.innerHTML = `<div id="clients-empty" style="grid-column:span 2;text-align:center;padding:3rem;color:var(--text-3)"><div style="font-size:40px;margin-bottom:10px">👥</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">No clients yet</div><div style="font-size:13px;margin-bottom:1rem">Add your first client to get started</div><button class="btn btn-primary" onclick="openNewClientModal()">+ Add Client</button></div>`;
+    return;
+  }
+  const colors = ['rgba(79,142,247,0.2)','rgba(168,85,247,0.2)','rgba(20,184,166,0.2)','rgba(245,158,11,0.2)','rgba(34,197,94,0.2)'];
+  const textColors = ['var(--accent)','var(--purple)','var(--teal)','var(--amber)','var(--green)'];
+  grid.innerHTML = clients.map((c,i) => `
+    <div class="card" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:44px;height:44px;border-radius:50%;background:${colors[i%colors.length]};color:${textColors[i%textColors.length]};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px">${c.name[0].toUpperCase()}</div>
+        <div><div style="font-size:14px;font-weight:600">${c.name}</div><div style="font-size:12px;color:var(--text-3)">${c.type} · Since ${c.joined}</div></div>
+        <span class="badge badge-blue" style="margin-left:auto">Active</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">Total Revenue</span><span class="stat-val" style="color:var(--green)">$${Number(c.revenue||0).toLocaleString()}</span></div>
+      <div class="stat-row"><span class="stat-label">Active Jobs</span><span class="stat-val">${c.jobs||0}</span></div>
+      <div class="stat-row"><span class="stat-label">Outstanding</span><span class="stat-val">${c.outstanding ? '$'+Number(c.outstanding).toLocaleString() : '$0'}</span></div>
+      ${c.phone ? `<div style="margin-top:8px;font-size:12px;color:var(--text-3)">📞 ${c.phone}</div>` : ''}
+    </div>`).join('');
+}
+
+// ── NEW INVOICE MODAL ────────────────────────────────────────────
+function openNewInvoiceModal() { openModal('modal-new-invoice'); }
+function submitNewInvoice() {
+  const client = document.getElementById('ni-client').value;
+  const desc   = document.getElementById('ni-desc')?.value.trim() || 'Services';
+  const amount = document.getElementById('ni-amount').value;
+  const due    = document.querySelector('#modal-new-invoice input[type="date"]')?.value || '—';
+  if (!amount) { showToast('Amount required', 'error'); return; }
+  const invoices = getData('cpro_invoices');
+  const id = 'INV-' + (1000 + invoices.length + 1);
+  invoices.push({ id, client, desc, amount: parseFloat(amount)||0, due, status:'Draft', created: new Date().toLocaleDateString() });
+  saveData('cpro_invoices', invoices);
+  addActivity('💰', `Invoice #${id} created — ${client}`, '$'+parseFloat(amount).toLocaleString());
+  closeModal('modal-new-invoice');
+  showToast(`✓ Invoice #${id} created for ${client}`);
+  document.getElementById('ni-amount').value = '';
+  renderInvoicesTable();
+  updateDashMetrics();
+}
+
+function renderInvoicesTable() {
+  const invoices = getData('cpro_invoices');
+  const tbody = document.getElementById('invoices-tbody');
+  if (!tbody) return;
+  if (!invoices.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-3)"><div style="font-size:32px;margin-bottom:8px">💰</div><div style="font-size:14px;font-weight:500;margin-bottom:6px">No invoices yet</div><div style="font-size:12px">Click "+ New Invoice" to create your first invoice</div></td></tr>`;
+    return;
+  }
+  const badgeMap = { Paid:'badge-green', Sent:'badge-blue', Overdue:'badge-red', Draft:'badge-gray', Partial:'badge-purple' };
+  tbody.innerHTML = invoices.map((inv, i) => {
+    let actionBtn = '';
+    if (inv.status === 'Draft')
+      actionBtn = `<button class="btn btn-primary btn-sm" onclick="updateInvoiceStatus(${i},'Sent')">Send</button>`;
+    else if (inv.status === 'Sent')
+      actionBtn = `<button class="btn btn-ghost btn-sm" onclick="updateInvoiceStatus(${i},'Paid')">Mark Paid</button>`;
+    else if (inv.status === 'Paid')
+      actionBtn = `<button class="btn btn-ghost btn-sm" onclick="openInvoiceView('${inv.id}','${inv.client}','${inv.desc}','$${Number(inv.amount).toLocaleString()}','${inv.due}','${inv.status}','${badgeMap[inv.status]||"badge-gray"}')">View</button>`;
+    return `<tr>
+      <td style="font-family:var(--mono);font-size:12px">#${inv.id}</td>
+      <td>${inv.client}</td>
+      <td style="color:var(--text-2)">${inv.desc}</td>
+      <td style="font-weight:600">$${Number(inv.amount).toLocaleString()}</td>
+      <td style="font-size:12px">${inv.due}</td>
+      <td><span class="badge ${badgeMap[inv.status]||'badge-gray'}">${inv.status}</span></td>
+      <td>${actionBtn}</td>
+    </tr>`;
+  }).join('');
+  // update metrics
+  const total = invoices.reduce((s,i) => s+(i.amount||0), 0);
+  const paid  = invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+(i.amount||0),0);
+  const pending = invoices.filter(i=>i.status==='Sent').reduce((s,i)=>s+(i.amount||0),0);
+  const overdue = invoices.filter(i=>i.status==='Overdue').reduce((s,i)=>s+(i.amount||0),0);
+  const el1 = document.getElementById('inv-total');   if(el1) el1.textContent='$'+total.toLocaleString();
+  const el2 = document.getElementById('inv-paid');    if(el2) el2.textContent='$'+paid.toLocaleString();
+  const el3 = document.getElementById('inv-pending'); if(el3) el3.textContent='$'+pending.toLocaleString();
+  const el4 = document.getElementById('inv-overdue'); if(el4) el4.textContent='$'+overdue.toLocaleString();
+}
+
+function updateInvoiceStatus(idx, newStatus) {
+  const invoices = getData('cpro_invoices');
+  if (!invoices[idx]) return;
+  const inv = invoices[idx];
+  inv.status = newStatus;
+  saveData('cpro_invoices', invoices);
+  addActivity('💰', `Invoice #${inv.id} ${newStatus}`, inv.client);
+  showToast(`✓ Invoice #${inv.id} marked as ${newStatus}`);
+  renderInvoicesTable();
+  updateDashMetrics();
+}
+
+// ── DASHBOARD METRICS ─────────────────────────────────────────────
+function updateDashMetrics() {
+  const jobs     = getData('cpro_jobs');
+  const invoices = getData('cpro_invoices');
+  const active   = jobs.filter(j => j.status !== 'Completed').length;
+  const revenue  = invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+(i.amount||0),0);
+  const outstanding = invoices.filter(i=>i.status!=='Paid').reduce((s,i)=>s+(i.amount||0),0);
+  const el1 = document.getElementById('m-revenue');    if(el1) el1.textContent='$'+revenue.toLocaleString();
+  const el2 = document.getElementById('m-jobs');       if(el2) el2.textContent=active;
+  const el3 = document.getElementById('m-outstanding');if(el3) el3.textContent='$'+outstanding.toLocaleString();
+  // recent activity
+  renderActivity();
+  renderTopClients();
+}
+
+// ── ACTIVITY LOG ──────────────────────────────────────────────────
+function addActivity(icon, title, sub) {
+  const logs = getData('cpro_activity');
+  logs.unshift({ icon, title, sub, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) });
+  if (logs.length > 20) logs.pop();
+  saveData('cpro_activity', logs);
+}
+function renderActivity() {
+  const logs = getData('cpro_activity');
+  const el = document.getElementById('dash-activity');
+  if (!el) return;
+  if (!logs.length) { el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-3)"><div style="font-size:28px;margin-bottom:8px">📋</div><div>No activity yet</div></div>`; return; }
+  el.innerHTML = logs.slice(0,5).map(l => `
+    <div class="timeline-item">
+      <div class="timeline-icon" style="background:rgba(79,142,247,0.1);font-size:14px">${l.icon}</div>
+      <div class="timeline-body">
+        <div class="timeline-title">${l.title}</div>
+        <div class="timeline-time">${l.sub} · ${l.time}</div>
+      </div>
+    </div>`).join('');
+}
+function renderTopClients() {
+  const clients = getData('cpro_clients');
+  const el = document.getElementById('dash-top-clients');
+  if (!el) return;
+  if (!clients.length) { el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-3)"><div style="font-size:28px;margin-bottom:8px">👥</div><div>No clients yet</div><div style="font-size:11px;margin-top:4px"><a onclick="navigate('clients')" style="color:var(--accent);cursor:pointer">Add your first client →</a></div></div>`; return; }
+  const sorted = [...clients].sort((a,b) => (b.revenue||0)-(a.revenue||0)).slice(0,5);
+  const max = sorted[0]?.revenue || 1;
+  el.innerHTML = sorted.map(c => `
+    <div class="stat-row">
+      <div><div class="stat-label">${c.name}</div>
+      <div class="progress-bar" style="width:160px"><div class="progress-fill progress-blue" style="width:${Math.round(((c.revenue||0)/max)*100)}%"></div></div></div>
+      <div class="stat-val">$${Number(c.revenue||0).toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// ── NEW PROPOSAL MODAL ───────────────────────────────────────────
+function openNewProposalModal() { navigate('proposals'); }
+
+// ── NEW ESTIMATE MODAL ───────────────────────────────────────────
+function openNewEstimateModal() { navigate('estimates'); }
+
+// ── BOOK JOB MODAL ───────────────────────────────────────────────
+function openBookJobModal() { openModal('modal-book-job'); }
+function submitBookJob() {
+  const title = document.getElementById('bj-title').value.trim();
+  const client = document.querySelector('#modal-book-job select')?.value || '—';
+  const tech   = document.querySelectorAll('#modal-book-job select')[1]?.value || '—';
+  const date   = document.querySelector('#modal-book-job input[type="date"]')?.value || '';
+  const time   = document.querySelectorAll('#modal-book-job select')[2]?.value || '8:00 AM';
+  if (!title) { showToast('Job title required', 'error'); return; }
+
+  // Save to schedule data
+  const schedEvents = getData('cpro_schedule');
+  schedEvents.push({ title, client, tech, date, time, color: 'blue' });
+  saveData('cpro_schedule', schedEvents);
+
+  addActivity('📅', `Job scheduled — ${title}`, `${client} · ${time}`);
+  closeModal('modal-book-job');
+  showToast(`✓ "${title}" scheduled for ${date||'this week'}`);
+  document.getElementById('bj-title').value = '';
+  renderSchedule();
+}
+
+// ── NEW AUTOMATION MODAL ─────────────────────────────────────────
+function openNewAutomationModal() { openModal('modal-new-automation'); }
+function submitNewAutomation() {
+  const trigger = document.getElementById('na-trigger').value;
+  const action = document.getElementById('na-action').value;
+  closeModal('modal-new-automation');
+  showToast(`✓ Automation created: ${trigger} → ${action}`);
+}
+
+// ── SCHEDULE RENDER ───────────────────────────────────────────────
+function renderSchedule() {
+  const events = getData('cpro_schedule');
+  const timeSlots = ['8 AM','10 AM','12 PM','2 PM','4 PM'];
+  const days = 5;
+  // Clear all cells
+  document.querySelectorAll('.sched-cell').forEach(c => c.innerHTML = '');
+  if (!events.length) return;
+
+  // Map time to row index
+  const timeMap = {'8:00 AM':0,'10:00 AM':1,'12:00 PM':2,'2:00 PM':3,'4:00 PM':4,'8 AM':0,'10 AM':1,'12 PM':2,'2 PM':3,'4 PM':4};
+  const colorMap = { blue:'sched-event-blue', green:'sched-event-green', amber:'sched-event-amber', purple:'sched-event-purple' };
+  const colors = ['sched-event-blue','sched-event-green','sched-event-amber','sched-event-purple'];
+
+  events.forEach((ev, idx) => {
+    const rowIdx = timeMap[ev.time] ?? (idx % 5);
+    const colIdx = idx % days;
+    // Find cell: rows of 6 cells each (1 time + 5 day cols)
+    const allRows = document.querySelectorAll('.sched-time');
+    if (allRows[rowIdx]) {
+      // Get the next 5 siblings (day cells)
+      let cell = allRows[rowIdx];
+      for (let i = 0; i <= colIdx; i++) cell = cell.nextElementSibling;
+      if (cell && cell.classList.contains('sched-cell')) {
+        const color = colorMap[ev.color] || colors[idx % colors.length];
+        cell.innerHTML = `<div class="sched-event ${color}">${ev.title}<br/><span style="opacity:0.8">${ev.tech||ev.client||''}</span></div>`;
+      }
+    }
+  });
+}
+
+// ── AUTH GUARD ────────────────────────────────────────────────────
+(function() {
+  if (localStorage.getItem('cpro_auth') !== '1') {
+    window.location.href = 'index.html';
+    return;
+  }
+  if (localStorage.getItem('cpro_role') === 'admin') {
+    window.location.href = 'admin.html';
+  }
+})();
+
+// ── LOAD USER DATA ────────────────────────────────────────────────
+function loadUserData() {
+  try {
+    const raw = localStorage.getItem('cpro_user');
+    if (!raw) return;
+    const user = JSON.parse(raw);
+    const nameEl = document.getElementById('sb-name');
+    const planEl = document.getElementById('sb-plan');
+    const avatarEl = document.getElementById('sb-avatar');
+    if (nameEl) nameEl.textContent = user.name || 'User';
+    if (planEl) planEl.textContent = (user.plan || 'Pro') + ' · Owner';
+    if (avatarEl) avatarEl.textContent = user.initials || 'ME';
+    const greetEl = document.getElementById('dash-greeting');
+    if (greetEl) {
+      const hr = new Date().getHours();
+      const time = hr < 12 ? 'morning' : hr < 17 ? 'afternoon' : 'evening';
+      const firstName = (user.name || 'there').split(' ')[0];
+      greetEl.textContent = 'Good ' + time + ', ' + firstName + '! You have 3 new leads and 2 overdue invoices.';
+    }
+  } catch(e) {}
+}
+
+// ── SIGN OUT ──────────────────────────────────────────────────────
+function doSignOut() {
+  localStorage.removeItem('cpro_auth');
+  localStorage.removeItem('cpro_user');
+  localStorage.removeItem('cpro_role');
+  window.location.href = 'index.html';
+}
+
+window.addEventListener('DOMContentLoaded', loadUserData);
+</script>
+</body>
+</html>

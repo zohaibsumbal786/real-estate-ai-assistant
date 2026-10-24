@@ -34,7 +34,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/dubai_ai_business_agent?schema=public
       REDIS_URL: redis://redis:6379
       PORT: 4000
-      WEB_ORIGIN: http://localhost:3000
+      WEB_ORIGIN: http://localhost:4000
     ports:
       - "4000:4000"
     depends_on:
@@ -44,17 +44,6 @@ services:
         condition: service_healthy
     volumes:
       - uploads_data:/app/storage/uploads
-
-  web:
-    build:
-      context: .
-      dockerfile: deploy/docker/Dockerfile.web
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api
 
   knowledge-worker:
     build:

@@ -32,25 +32,21 @@ export function createApp() {
   const app = express();
 
   app.use(helmet({
-    // Enhanced security headers
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https:"],
-        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
-        frameSrc: ["'none'"],
-        objectSrc: ["'none'"]
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        connectSrc: ["'self'", "http://localhost:4000", "https:"],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+        frameSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        workerSrc: ["'self'", "blob:"]
       }
     },
-    // Prevent MIME type sniffing
-    noSniff: true,
-    // Enable XSS protection
-    xssFilter: true,
-    // Prevent clickjacking
-    frameguard: { action: "deny" }
+    crossOriginEmbedderPolicy: false,
+    frameguard: false
   }));
   
   // Parse CORS origins from config (comma-separated)
@@ -107,33 +103,6 @@ export function createApp() {
 
   // Serve static frontend files
   app.use(express.static(publicPath));
-
-  // Root endpoint
-  app.get("/", (_req, res) => {
-    res.json({
-      name: "Dubai AI Business Agent API",
-      version: "0.1.0",
-      status: "running",
-      documentation: "https://github.com/dubai-ai/docs",
-      health: "/health",
-      endpoints: {
-        auth: "/api/auth",
-        analytics: "/api/analytics",
-        appointments: "/api/appointments",
-        billing: "/api/billing",
-        contact: "/api/contact",
-        dashboard: "/api/dashboard",
-        conversations: "/api/conversations",
-        customers: "/api/customers",
-        knowledge: "/api/knowledge",
-        leads: "/api/leads",
-        notifications: "/api/notifications",
-        settings: "/api/settings",
-        team: "/api/team",
-        whatsapp: "/api/whatsapp"
-      }
-    });
-  });
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", service: "contractorpro-ai" });

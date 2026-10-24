@@ -47,6 +47,10 @@ const resetPasswordSchema = z.object({
   newPassword: z.string().min(10).max(128)
 });
 
+function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
 authRouter.post("/register", authRateLimiter, async (req, res, next) => {
   try {
     const payload = registerSchema.parse(req.body);
@@ -100,33 +104,36 @@ authRouter.post("/change-password", authenticate, enforceTenant, async (req, res
   }
 });
 
-authRouter.post("/forgot-password", async (req, res, next) => {
+authRouter.post("/forgot-password", authRateLimiter, async (req, res, next) => {
   try {
     const payload = forgotPasswordSchema.parse(req.body);
     const user = await prisma.user.findUnique({
       where: { email: payload.email }
     });
 
+    const genericMessage =
+      "If an account exists, a password reset link has been sent to your email.";
+
     if (!user) {
-      // Don't reveal if email exists for security
-      return res.json({
-        success: true,
-        message: "If an account exists, a password reset link has been sent to your email."
-      });
+      return res.json({ success: true, message: genericMessage });
     }
 
-    // Generate reset token (in production, store this in DB with 1-hour expiry)
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const tokenHash = hashToken(resetToken);
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
-    // Note: In production, implement proper password reset with a dedicated model
-    // For now, we're just logging that a reset was requested
-    console.log("[Auth] Password reset token generated for", user.email);
-    console.log("[Auth] Reset token:", resetToken); // Don't log in production!
+    await prisma.passwordResetToken.updateMany({
+      where: { userId: user.id, usedAt: null },
+      data: { usedAt: new Date() }
+    });
+
+    await prisma.passwordResetToken.create({
+      data: { userId: user.id, tokenHash, expiresAt }
+    });
 
     res.json({
       success: true,
-      message: "If an account exists, a password reset link has been sent to your email.",
+      message: genericMessage,
       _debug_resetToken: process.env.NODE_ENV === "development" ? resetToken : undefined
     });
   } catch (error) {
@@ -134,7 +141,7 @@ authRouter.post("/forgot-password", async (req, res, next) => {
   }
 });
 
-authRouter.post("/reset-password", async (req, res, next) => {
+authRouter.post("/reset-password", authRateLimiter, async (req, res, next) => {
   try {
     const payload = resetPasswordSchema.parse(req.body);
     const user = await prisma.user.findUnique({
@@ -145,13 +152,37 @@ authRouter.post("/reset-password", async (req, res, next) => {
       throw new HttpError(404, "User not found", "USER_NOT_FOUND");
     }
 
-    // TODO: Implement proper password reset with token verification
-    // For now, this is a placeholder. In production:
-    // 1. Create a PasswordResetToken model with user_id, token, expires_at
-    // 2. Store the hashed token there
-    // 3. Verify against stored token before allowing password update
+    const tokenHash = hashToken(payload.resetToken);
+    const record = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: user.id,
+        tokenHash,
+        usedAt: null,
+        expiresAt: { gt: new Date() }
+      }
+    });
 
-    throw new HttpError(400, "Password reset not yet fully implemented", "NOT_IMPLEMENTED");
+    if (!record) {
+      throw new HttpError(400, "Invalid or expired reset token", "INVALID_RESET_TOKEN");
+    }
+
+    const passwordHash = await bcrypt.hash(payload.newPassword, 12);
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash }
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: record.id },
+        data: { usedAt: new Date() }
+      }),
+      prisma.refreshToken.updateMany({
+        where: { userId: user.id },
+        data: { revokedAt: new Date() }
+      })
+    ]);
+
+    res.json({ success: true, message: "Password reset successfully" });
   } catch (error) {
     next(error);
   }

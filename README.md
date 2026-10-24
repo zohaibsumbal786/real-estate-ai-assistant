@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Dubai AI Business Agent
 
 **AI-powered WhatsApp assistant for UAE SMEs. Production-ready SaaS with real Stripe billing, live WhatsApp integration, and Arabic support.**
@@ -374,7 +373,3 @@ psql -U postgres -d dubai_ai_business_agent
 ## 📝 LICENSE & OWNERSHIP
 
 Private project. All rights reserved. Built 2024-2026 for Dubai AI Business Agent.
-=======
-# Real-Estate-Ai-Assitant
-this project is to automate all Dubai companies
->>>>>>> d3334f0127b5d3695b299684a4c50576b328f0a4

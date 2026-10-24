@@ -506,23 +506,43 @@ async function doSignIn() {
   btn.innerHTML = '<span class="spinner"></span> Signing in...';
   btn.disabled = true;
 
-  // Try real API first, fallback to demo credentials
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const user = { email, name: data.data?.user?.name || email, initials: (data.data?.user?.name||email).split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(), company: data.data?.user?.company || 'My Company', plan: 'Pro', role: data.data?.user?.role?.toLowerCase() === 'admin' ? 'admin' : 'user', token: data.data?.accessToken };
-      localStorage.setItem('cpro_user', JSON.stringify(user));
-      localStorage.setItem('cpro_auth', '1');
-      localStorage.setItem('cpro_role', user.role);
-      window.location.href = user.role === 'admin' ? 'admin.html' : 'app.html';
-      return;
-    }
-  } catch(e) { /* API not available, use demo */ }
+  // Try real API with 2s timeout, fallback to demo credentials immediately
+  let apiSuccess = false;
+  // Only try API if not using demo credentials
+  const isDemoEmail = email in CREDENTIALS;
+  if (!isDemoEmail) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        const uname = data.data?.user?.name || email;
+        const user = {
+          email,
+          name: uname,
+          initials: uname.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+          company: data.data?.user?.company || 'My Company',
+          plan: 'Pro',
+          role: (data.data?.user?.role||'').toLowerCase() === 'admin' ? 'admin' : 'user',
+          token: data.data?.accessToken
+        };
+        localStorage.setItem('cpro_user', JSON.stringify(user));
+        localStorage.setItem('cpro_auth', '1');
+        localStorage.setItem('cpro_role', user.role);
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'app.html';
+        apiSuccess = true;
+      }
+    } catch(e) { /* API unavailable, use demo fallback */ }
+  }
+
+  if (apiSuccess) return;
 
   // Demo credentials fallback
   const cred = CREDENTIALS[email];
@@ -562,12 +582,17 @@ async function doSignUp() {
   btn.innerHTML = '<span class="spinner"></span> Creating account...';
   btn.disabled = true;
 
+  let apiSuccess = false;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass, name: fname + ' ' + lname, companyName: company })
+      body: JSON.stringify({ email, password: pass, name: fname + ' ' + lname, companyName: company }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     if (res.ok) {
       const data = await res.json();
       const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial', token: data.data?.accessToken };
@@ -575,16 +600,17 @@ async function doSignUp() {
       localStorage.setItem('cpro_auth', '1');
       localStorage.setItem('cpro_role', 'user');
       window.location.href = 'app.html';
-      return;
+      apiSuccess = true;
     }
   } catch(e) { /* fallback */ }
 
-  // Offline/demo fallback
-  const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial' };
-  localStorage.setItem('cpro_user', JSON.stringify(user));
-  localStorage.setItem('cpro_auth', '1');
-  localStorage.setItem('cpro_role', 'user');
-  window.location.href = 'app.html';
+  if (!apiSuccess) {
+    const user = { email, name: fname + ' ' + lname, initials: fname[0] + lname[0], company, plan: 'Pro Trial' };
+    localStorage.setItem('cpro_user', JSON.stringify(user));
+    localStorage.setItem('cpro_auth', '1');
+    localStorage.setItem('cpro_role', 'user');
+    window.location.href = 'app.html';
+  }
 }
 
 // ── GOOGLE AUTH ─────────────────────────────────────────────────

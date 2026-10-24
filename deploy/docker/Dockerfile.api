@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/
 FROM base AS deps
 COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/
-COPY apps/web/package.json apps/web/
 COPY packages/db/package.json packages/db/
 RUN npm ci
 
@@ -21,6 +20,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/apps/api ./apps/api
 COPY --from=build /app/packages/db ./packages/db
+COPY --from=build /app/public ./public
 COPY --from=build /app/storage ./storage
 EXPOSE 4000
 CMD ["npm", "run", "start", "--workspace", "@dubai-ai/api"]

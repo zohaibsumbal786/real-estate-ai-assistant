@@ -34,7 +34,26 @@ customersRouter.post("/", async (req, res, next) => {
         organizationId: req.tenantId!
       }
     });
-    res.status(201).json(customer);
+    res.status(201).json({ data: customer });
+  } catch (error) {
+    next(error);
+  }
+});
+
+customersRouter.patch("/:id", async (req, res, next) => {
+  try {
+    const payload = createCustomerSchema.partial().parse(req.body);
+    const existing = await prisma.customer.findFirst({
+      where: { id: req.params.id, organizationId: req.tenantId! }
+    });
+    if (!existing) {
+      return res.status(404).json({ error: { message: "Customer not found" } });
+    }
+    const customer = await prisma.customer.update({
+      where: { id: existing.id },
+      data: payload
+    });
+    res.json({ data: customer });
   } catch (error) {
     next(error);
   }

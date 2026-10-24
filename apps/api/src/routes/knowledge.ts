@@ -85,3 +85,18 @@ knowledgeRouter.get("/search", async (req, res, next) => {
     next(error);
   }
 });
+
+knowledgeRouter.delete("/documents/:id", async (req, res, next) => {
+  try {
+    const existing = await prisma.knowledgeDocument.findFirst({
+      where: { id: req.params.id, organizationId: req.tenantId! }
+    });
+    if (!existing) {
+      throw new HttpError(404, "Document not found", "DOCUMENT_NOT_FOUND");
+    }
+    await prisma.knowledgeDocument.delete({ where: { id: existing.id } });
+    res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+});
